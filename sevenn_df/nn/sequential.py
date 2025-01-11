@@ -6,8 +6,8 @@ import torch
 import torch.nn as nn
 from e3nn.util.jit import compile_mode
 
-import sevenn._keys as KEY
-from sevenn._const import AtomGraphDataType
+import sevenn_df._keys as KEY
+from sevenn_df._const import AtomGraphDataType
 
 
 @compile_mode('script')

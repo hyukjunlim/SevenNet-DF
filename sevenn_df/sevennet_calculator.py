@@ -9,11 +9,11 @@ import torch.jit._script
 from ase.calculators.calculator import Calculator, all_changes
 from ase.data import chemical_symbols
 
-import sevenn._keys as KEY
-import sevenn.util as util
-from sevenn.atom_graph_data import AtomGraphData
-from sevenn.nn.sequential import AtomGraphSequential
-from sevenn.train.dataload import unlabeled_atoms_to_graph
+import sevenn_df._keys as KEY
+import sevenn_df.util as util
+from sevenn_df.atom_graph_data import AtomGraphData
+from sevenn_df.nn.sequential import AtomGraphSequential
+from sevenn_df.train.dataload import unlabeled_atoms_to_graph
 
 torch_script_type = torch.jit._script.RecursiveScriptModule
 

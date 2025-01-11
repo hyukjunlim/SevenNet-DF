@@ -51,6 +51,8 @@ class AtomReduce(nn.Module):
         data_key_out: str,
         reduce: str = 'sum',
         constant: float = 1.0,
+        data_key_cell_volume: str = KEY.CELL_VOLUME,
+        mode: str = 'energy',
     ):
         super().__init__()
 
@@ -58,22 +60,32 @@ class AtomReduce(nn.Module):
         self.key_output = data_key_out
         self.constant = constant
         self.reduce = reduce
+        self.mode = mode
+        self.key_cell_volume = data_key_cell_volume
 
         # controlled by the upper most wrapper 'AtomGraphSequential'
         self._is_batch_data = True
 
     def forward(self, data: AtomGraphDataType) -> AtomGraphDataType:
+        volume = data[self.key_cell_volume]
         if self._is_batch_data:
-            src = data[self.key_input].squeeze(1)
+            src = data[self.key_input]
+            src_shape = src.shape
             size = int(data[KEY.BATCH].max()) + 1
             output = torch.zeros(
-                (size), dtype=src.dtype, device=src.device,
+                (size, *src_shape[1:]), dtype=src.dtype, device=src.device
             )
-            output.scatter_reduce_(0, data[KEY.BATCH], src, reduce='sum')
+            output.scatter_reduce_(0, data[KEY.BATCH].unsqueeze(-1).expand_as(src), src, reduce='sum')
+            if self.mode == 'energy':
+                output = output.squeeze(1)
+            elif self.mode == 'stress':
+                output = torch.neg(output) / volume.view(-1, 1)
             data[self.key_output] = output * self.constant
         else:
+            if self.mode == 'stress':
+                data[self.key_input] = torch.neg(data[self.key_input]) / volume
             data[self.key_output] = (
-                torch.sum(data[self.key_input]) * self.constant
+                torch.sum(data[self.key_input], dim=0) * self.constant
             )
 
         return data

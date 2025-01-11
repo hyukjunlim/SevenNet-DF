@@ -39,6 +39,9 @@ EDGE_IDX: Final[str] = 'edge_index'  # (2, N_edge) PyG
 ATOM_TYPE: Final[str] = 'atom_type'  # (N) one-hot index of nodes
 NODE_FEATURE: Final[str] = 'x'  # (N, ?) PyG
 NODE_FEATURE_GHOST: Final[str] = 'x_ghost'
+NODE_FEATURE_E: Final[str] = 'x_E'
+NODE_FEATURE_F: Final[str] = 'x_F'
+NODE_FEATURE_S: Final[str] = 'x_S'
 NODE_ATTR: Final[str] = 'node_attr'  # (N, N_species) from one_hot
 EDGE_ATTR: Final[str] = 'edge_attr'  # (from spherical harmonics)
 EDGE_EMBEDDING: Final[str] = 'edge_embedding'  # (from edge embedding)
@@ -62,8 +65,9 @@ PER_ATOM_ENERGY: Final[str] = 'per_atom_energy'
 PRED_FORCE: Final[str] = 'inferred_force'
 SCALED_FORCE: Final[str] = 'scaled_force'
 
+SCALED_STRESS: Final[str] = 'atomic_stress'
+ATOMIC_STRESS: Final[str] = 'scaled_stress'
 PRED_STRESS: Final[str] = 'inferred_stress'
-SCALED_STRESS: Final[str] = 'scaled_stress'
 
 # very general data property for AtomGraphData
 NUM_ATOMS: Final[str] = 'num_atoms'  # int

@@ -7,7 +7,7 @@ import torch
 import torch.nn
 from e3nn.o3 import FullTensorProduct, Irreps
 
-import sevenn._keys as KEY
+import sevenn_df._keys as KEY
 
 
 def to_atom_graph_list(atom_graph_batch):
@@ -282,7 +282,7 @@ def infer_irreps_out(
     parity_mode: str = 'full',
     fix_multiplicity: Union[bool, int] = False,
 ):
-    assert parity_mode in ['full', 'even', 'sph']
+    assert parity_mode in ['full', 'even', 'sph', 'direct']
     # (mul, (ir, p))
     irreps_out = FullTensorProduct(irreps_x, irreps_operand).irreps_out.simplify()
     new_irreps_elem = []
@@ -290,7 +290,10 @@ def infer_irreps_out(
         elem = (mul, (l, p))
         if drop_l is not False and l > drop_l:
             continue
-        if parity_mode == 'even' and p == -1:
+        if parity_mode == 'direct':
+            if not (l == 0 and p == 1 or l == 1 and p == -1 or l == 2 and p == 1):
+                continue
+        elif parity_mode == 'even' and p == -1:
             continue
         elif parity_mode == 'sph' and p != (-1) ** l:
             continue
