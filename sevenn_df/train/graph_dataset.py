@@ -319,6 +319,7 @@ class SevenNetGraphDataset(InMemoryDataset):
             'num_graphs': self.statistics[KEY.ENERGY]['count'],
             'per_atom_energy_mean': self.per_atom_energy_mean,
             'force_rms': self.force_rms,
+            'stress_rms': self.stress_rms,
             'per_atom_energy_std': self.per_atom_energy_std,
             'avg_num_neigh': self.avg_num_neigh,
             'sqrt_avg_num_neigh': self.sqrt_avg_num_neigh,
@@ -347,6 +348,12 @@ class SevenNetGraphDataset(InMemoryDataset):
     def force_rms(self):
         mean = self.statistics[KEY.FORCE]['mean']
         std = self.statistics[KEY.FORCE]['std']
+        return float((mean**2 + std**2) ** (0.5))
+    
+    @property
+    def stress_rms(self):
+        mean = self.statistics[KEY.STRESS]['mean']
+        std = self.statistics[KEY.STRESS]['std']
         return float((mean**2 + std**2) ** (0.5))
 
     @property

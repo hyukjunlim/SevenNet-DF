@@ -82,21 +82,21 @@ def init_feature_reduce(config, irreps_x):
     # features per node to scalar per node
     layers = OrderedDict()
     if config[KEY.READOUT_AS_FCN] is False:
-        dim = irreps_x.dim // 18
-        hidden_irreps_0e = Irreps([(dim, (0, 1))])
-        hidden_irreps_1o = Irreps([(dim, (1, -1))])
-        hidden_irreps_2e = Irreps([(dim, (2, 1))]+[(dim, (0, 1))])
+        dim = irreps_x.dim // 8
+        hidden_irreps_E = Irreps([(dim, (0, 1))])
+        hidden_irreps_F = Irreps([(dim, (1, -1))])
+        hidden_irreps_S = Irreps([(dim, (1, -1))])
         layers.update(
             {
                 'reduce_input_to_hidden_0e': IrrepsLinear(
                     irreps_x,
-                    hidden_irreps_0e,
+                    hidden_irreps_E,
                     data_key_in=KEY.NODE_FEATURE,
                     data_key_out=KEY.NODE_FEATURE_E,
                     biases=config[KEY.USE_BIAS_IN_LINEAR],
                 ),
                 'reduce_hidden_to_energy_0e': IrrepsLinear(
-                    hidden_irreps_0e,
+                    hidden_irreps_E,
                     Irreps([(1, (0, 1))]),
                     data_key_in=KEY.NODE_FEATURE_E,
                     data_key_out=KEY.SCALED_ATOMIC_ENERGY,
@@ -104,35 +104,40 @@ def init_feature_reduce(config, irreps_x):
                 ),
                 'reduce_input_to_hidden_1o': IrrepsLinear(
                     irreps_x,
-                    hidden_irreps_1o,
+                    hidden_irreps_F,
                     data_key_in=KEY.NODE_FEATURE,
                     data_key_out=KEY.NODE_FEATURE_F,
                     biases=config[KEY.USE_BIAS_IN_LINEAR],
                 ),
                 'reduce_hidden_to_force_1o': IrrepsLinear(
-                    hidden_irreps_1o,
+                    hidden_irreps_F,
                     Irreps([(1, (1, -1))]),
                     data_key_in=KEY.NODE_FEATURE_F,
-                    data_key_out=KEY.PRED_FORCE,
+                    data_key_out=KEY.SCALED_ATOMIC_FORCE,
                     biases=config[KEY.USE_BIAS_IN_LINEAR],
                 ),
-                'reduce_input_to_hidden_2e': IrrepsLinear(
+                'reduce_input_to_hidden_3x1o': IrrepsLinear(
                     irreps_x,
-                    hidden_irreps_2e,
+                    hidden_irreps_S,
                     data_key_in=KEY.NODE_FEATURE,
                     data_key_out=KEY.NODE_FEATURE_S,
                     biases=config[KEY.USE_BIAS_IN_LINEAR],
                 ),
-                'reduce_hidden_to_stress_2e': IrrepsLinear(
-                    hidden_irreps_2e,
-                    Irreps([(1, (2, 1))]+[(1, (0, 1))]),
+                'reduce_hidden_to_stress_3x1o': IrrepsLinear(
+                    hidden_irreps_S,
+                    Irreps([(1, (1, -1))]),
                     data_key_in=KEY.NODE_FEATURE_S,
-                    data_key_out=KEY.ATOMIC_STRESS,
+                    data_key_out=KEY.SCALED_ATOMIC_STRESS,
                     biases=config[KEY.USE_BIAS_IN_LINEAR],
                 ),
             }
-        )
-    else:
+        )# trainig, inference, 
+          # rotation equivariance-scipy (abc vec)
+          # IrrepsLinear
+          # vv^T
+          # self.scale stress?
+          # 
+    else: 
         act = _const.ACTIVATION[config[KEY.READOUT_FCN_ACTIVATION]]
         hidden_neurons = config[KEY.READOUT_FCN_HIDDEN_NEURONS]
         layers.update(
@@ -167,13 +172,15 @@ def init_shift_scale(config):
             s = [s[z] for z in sorted(type_map, key=type_map.get)]
         shift_scale.append(s)
 
-    rescale_module = None
-    if all([isinstance(s, float) for s in shift_scale]):
-        rescale_module = Rescale
-    elif any([isinstance(s, list) for s in shift_scale]):
-        rescale_module = SpeciesWiseRescale
-    else:
-        raise ValueError('shift, scale should be list of float or float')
+    rescale_module = Rescale
+    
+    # rescale_module = None
+    # if all([isinstance(s, dict) for s in shift_scale]):
+    #     rescale_module = Rescale
+    # elif any([isinstance(s, list) for s in shift_scale]):
+    #     rescale_module = SpeciesWiseRescale
+    # else:
+    #     raise ValueError('shift, scale should be list of float or float')
 
     shift, scale = shift_scale
 
@@ -380,7 +387,7 @@ def build_E3_equivariant_model(config: dict, parallel=False):
             parity_mode = 'full'
             fix_multiplicity = False
             if t == num_convolution_layer - 1:
-                lmax_node = 2
+                lmax_node = 1
                 parity_mode = 'direct'
             irreps_out_tp = util.infer_irreps_out(
                 irreps_x,  # type: ignore

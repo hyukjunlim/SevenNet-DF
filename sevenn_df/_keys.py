@@ -62,11 +62,11 @@ PRED_TOTAL_ENERGY: Final[str] = 'inferred_total_energy'
 PRED_PER_ATOM_ENERGY: Final[str] = 'inferred_per_atom_energy'
 PER_ATOM_ENERGY: Final[str] = 'per_atom_energy'
 
+SCALED_ATOMIC_FORCE: Final[str] = 'scaled_force'
 PRED_FORCE: Final[str] = 'inferred_force'
-SCALED_FORCE: Final[str] = 'scaled_force'
 
-SCALED_STRESS: Final[str] = 'atomic_stress'
-ATOMIC_STRESS: Final[str] = 'scaled_stress'
+SCALED_ATOMIC_STRESS: Final[str] = 'scaled_atomic_stress'
+ATOMIC_STRESS: Final[str] = 'atomic_stress'
 PRED_STRESS: Final[str] = 'inferred_stress'
 
 # very general data property for AtomGraphData

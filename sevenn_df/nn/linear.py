@@ -1,9 +1,10 @@
 from typing import Callable, List, Optional
+import math
 
 import torch
 import torch.nn as nn
 from e3nn.nn import FullyConnectedNet
-from e3nn.o3 import Irreps, Linear
+from e3nn.o3 import Irreps, Linear, FullyConnectedTensorProduct
 from e3nn.util.jit import compile_mode
 
 import sevenn._keys as KEY
@@ -79,15 +80,14 @@ class AtomReduce(nn.Module):
             if self.mode == 'energy':
                 output = output.squeeze(1)
             elif self.mode == 'stress':
-                output = torch.neg(output) / volume.view(-1, 1)
+                output = torch.einsum('bi,bj->bij', output, output).reshape(size, 9)[:, [0, 4, 8, 1, 5, 2]] / volume.view(-1, 1)
             data[self.key_output] = output * self.constant
         else:
+            output = torch.sum(data[self.key_input], dim=0)
             if self.mode == 'stress':
-                data[self.key_input] = torch.neg(data[self.key_input]) / volume
-            data[self.key_output] = (
-                torch.sum(data[self.key_input], dim=0) * self.constant
-            )
-
+                output = torch.einsum('i,j->ij', output, output).reshape(9)[[0, 4, 8, 1, 5, 2]] / volume
+            data[self.key_output] = output * self.constant
+            
         return data
 
 

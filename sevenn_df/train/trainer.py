@@ -159,6 +159,7 @@ class Trainer:
                 self.optimizer.zero_grad()
             batch = batch.to(self.device, non_blocking=True)
             output = self.model(batch)
+            # noised batch
             if error_recorder is not None:
                 error_recorder.update(output)
             if is_train:

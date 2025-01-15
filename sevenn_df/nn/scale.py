@@ -4,8 +4,8 @@ import torch
 import torch.nn as nn
 from e3nn.util.jit import compile_mode
 
-import sevenn._keys as KEY
-from sevenn._const import AtomGraphDataType
+import sevenn_df._keys as KEY
+from sevenn_df._const import AtomGraphDataType
 
 
 @compile_mode('script')
@@ -17,24 +17,33 @@ class Rescale(nn.Module):
     def __init__(
         self,
         shift: float,
-        scale: float,
-        data_key_in: str = KEY.SCALED_ATOMIC_ENERGY,
-        data_key_out: str = KEY.ATOMIC_ENERGY,
+        scale: dict,
+        data_key_in: list = [KEY.SCALED_ATOMIC_ENERGY, KEY.SCALED_ATOMIC_FORCE, KEY.SCALED_ATOMIC_STRESS],
+        data_key_out: list = [KEY.ATOMIC_ENERGY, KEY.PRED_FORCE, KEY.ATOMIC_STRESS],
         train_shift_scale: bool = False,
     ):
-        assert isinstance(shift, float) and isinstance(scale, float)
+        assert isinstance(shift, float) and all(isinstance(_, float) for _ in scale.values())
         super().__init__()
         self.shift = nn.Parameter(
             torch.FloatTensor([shift]), requires_grad=train_shift_scale
         )
-        self.scale = nn.Parameter(
-            torch.FloatTensor([scale]), requires_grad=train_shift_scale
+        self.scale_force = nn.Parameter(
+            torch.FloatTensor([scale['force']]), requires_grad=train_shift_scale
         )
-        self.key_input = data_key_in
-        self.key_output = data_key_out
+        self.scale_stress = nn.Parameter(
+            torch.FloatTensor([scale['stress']]), requires_grad=train_shift_scale
+        )
+        self.key_input_E = data_key_in[0]
+        self.key_input_F = data_key_in[1]
+        self.key_input_S = data_key_in[2]
+        self.key_output_E = data_key_out[0]
+        self.key_output_F = data_key_out[1]
+        self.key_output_S = data_key_out[2]
 
     def forward(self, data: AtomGraphDataType) -> AtomGraphDataType:
-        data[self.key_output] = data[self.key_input] * self.scale + self.shift
+        data[self.key_output_E] = data[self.key_input_E] * self.scale_force + self.shift
+        data[self.key_output_F] = data[self.key_input_F] * self.scale_force
+        data[self.key_output_S] = data[self.key_input_S] * self.scale_stress
 
         return data
 
