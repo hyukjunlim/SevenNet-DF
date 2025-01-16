@@ -44,6 +44,7 @@ class Rescale(nn.Module):
         data[self.key_output_E] = data[self.key_input_E] * self.scale_force + self.shift
         data[self.key_output_F] = data[self.key_input_F] * self.scale_force
         data[self.key_output_S] = data[self.key_input_S] * self.scale_stress
+        raise Exception(self.scale_stress)
 
         return data
 

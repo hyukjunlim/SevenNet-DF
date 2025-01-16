@@ -131,12 +131,8 @@ def init_feature_reduce(config, irreps_x):
                     biases=config[KEY.USE_BIAS_IN_LINEAR],
                 ),
             }
-        )# trainig, inference, 
-          # rotation equivariance-scipy (abc vec)
+        ) # training, inference, 
           # IrrepsLinear
-          # vv^T
-          # self.scale stress?
-          # 
     else: 
         act = _const.ACTIVATION[config[KEY.READOUT_FCN_ACTIVATION]]
         hidden_neurons = config[KEY.READOUT_FCN_HIDDEN_NEURONS]
