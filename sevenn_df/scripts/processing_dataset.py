@@ -2,11 +2,11 @@ import os
 
 import torch
 
-import sevenn._keys as KEY
-from sevenn.sevenn_logger import Logger
-from sevenn.train.dataload import file_to_dataset, match_reader
-from sevenn.train.dataset import AtomGraphDataset
-from sevenn.util import chemical_species_preprocess, onehot_to_chem
+import sevenn_df._keys as KEY
+from sevenn_df.sevenn_logger import Logger
+from sevenn_df.train.dataload import file_to_dataset, match_reader
+from sevenn_df.train.dataset import AtomGraphDataset
+from sevenn_df.util import chemical_species_preprocess, onehot_to_chem
 
 
 def dataset_load(file: str, config):

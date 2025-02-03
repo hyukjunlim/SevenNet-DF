@@ -9,11 +9,11 @@ from ase.calculators.singlepoint import SinglePointCalculator
 from torch_geometric.loader import DataLoader
 from tqdm import tqdm
 
-import sevenn._keys as KEY
-import sevenn.train.dataload as dl
-import sevenn.util as util
-from sevenn.atom_graph_data import AtomGraphData
-from sevenn.train.graph_dataset import SevenNetGraphDataset
+import sevenn_df._keys as KEY
+import sevenn_df.train.dataload as dl
+import sevenn_df.util as util
+from sevenn_df.atom_graph_data import AtomGraphData
+from sevenn_df.train.graph_dataset import SevenNetGraphDataset
 
 
 def write_inference_csv(output_list, out):

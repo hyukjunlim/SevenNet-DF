@@ -8,8 +8,8 @@ import torch
 from ase.data import chemical_symbols
 from sklearn.linear_model import Ridge
 
-import sevenn._keys as KEY
-import sevenn.util as util
+import sevenn_df._keys as KEY
+import sevenn_df.util as util
 
 
 class AtomGraphDataset:

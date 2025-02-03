@@ -6,8 +6,8 @@ from typing import Any, Dict, List, Optional
 
 from ase.data import atomic_numbers
 
-import sevenn._keys as KEY
-from sevenn import __version__
+import sevenn_df._keys as KEY
+from sevenn_df import __version__
 
 CHEM_SYMBOLS = {v: k for k, v in atomic_numbers.items()}
 

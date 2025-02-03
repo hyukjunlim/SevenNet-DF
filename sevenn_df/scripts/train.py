@@ -5,10 +5,10 @@ from torch.nn import Module
 from torch.utils.data.distributed import DistributedSampler
 from torch_geometric.loader import DataLoader
 
-import sevenn._keys as KEY
-from sevenn.model_build import build_E3_equivariant_model
-from sevenn.sevenn_logger import Logger
-from sevenn.train.trainer import Trainer
+import sevenn_df._keys as KEY
+from sevenn_df.model_build import build_E3_equivariant_model
+from sevenn_df.sevenn_logger import Logger
+from sevenn_df.train.trainer import Trainer
 
 
 def loader_from_config(config, dataset, is_train=False):
@@ -37,8 +37,8 @@ def train_v2(config, working_dir: str):
     """
     Main program flow, since v0.9.6
     """
-    import sevenn.train.atoms_dataset as atoms_dataset
-    import sevenn.train.graph_dataset as graph_dataset
+    import sevenn_df.train.atoms_dataset as atoms_dataset
+    import sevenn_df.train.graph_dataset as graph_dataset
 
     from .processing_continue import processing_continue_v2
     from .processing_epoch import processing_epoch_v2

@@ -7,9 +7,9 @@ import torch.nn
 from torch.nn.parallel import DistributedDataParallel as DDP
 from tqdm import tqdm
 
-import sevenn._keys as KEY
-from sevenn.error_recorder import ErrorRecorder
-from sevenn.train.loss import LossDefinition
+import sevenn_df._keys as KEY
+from sevenn_df.error_recorder import ErrorRecorder
+from sevenn_df.train.loss import LossDefinition
 
 from .loss import get_loss_functions_from_config
 from .optim import optim_dict, scheduler_dict

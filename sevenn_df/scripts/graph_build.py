@@ -1,9 +1,9 @@
 import os
 from typing import Optional
 
-from sevenn.sevenn_logger import Logger
-from sevenn.train.dataset import AtomGraphDataset
-from sevenn.util import unique_filepath
+from sevenn_df.sevenn_logger import Logger
+from sevenn_df.train.dataset import AtomGraphDataset
+from sevenn_df.util import unique_filepath
 
 
 def build_sevennet_graph_dataset(

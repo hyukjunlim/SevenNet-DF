@@ -6,9 +6,9 @@ from typing import Any, Callable, Dict
 import torch
 import yaml
 
-import sevenn._const as _const
-import sevenn._keys as KEY
-import sevenn.util as util
+import sevenn_df._const as _const
+import sevenn_df._keys as KEY
+import sevenn_df.util as util
 
 
 def config_initialize(

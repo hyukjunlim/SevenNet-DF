@@ -159,7 +159,7 @@ class SevenNetCalculator(Calculator):
             del data['data_info']
 
         output = self.model(data)
-        energy = output[KEY.PRED_TOTAL_ENERGY].detach().cpu().item()
+        energy = output[KEY.PRED_ENERGY].detach().cpu().item()
         # Store results
         self.results = {
             'free_energy': energy,

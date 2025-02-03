@@ -16,9 +16,10 @@ from .nn.edge_embedding import (
     XPLORCutoff,
 )
 from .nn.interaction_blocks import NequIP_interaction_block
+from .nn.force_output import DirectEnergyStressOutput, SplitEFS
 from .nn.linear import AtomReduce, FCN_e3nn, IrrepsLinear
 from .nn.node_embedding import OnehotEmbedding
-from .nn.scale import Rescale, SpeciesWiseRescale
+from .nn.scale import Rescale #, SpeciesWiseRescale
 from .nn.self_connection import (
     SelfConnectionIntro,
     SelfConnectionLinearIntro,
@@ -83,56 +84,24 @@ def init_feature_reduce(config, irreps_x):
     layers = OrderedDict()
     if config[KEY.READOUT_AS_FCN] is False:
         dim = irreps_x.dim // 8
-        hidden_irreps_E = Irreps([(dim, (0, 1))])
-        hidden_irreps_F = Irreps([(dim, (1, -1))])
-        hidden_irreps_S = Irreps([(dim, (1, -1))])
+        hidden_irreps = Irreps([(dim, (0, 1))]+[(dim, (1, -1))]+[(dim, (1, -1))])
         layers.update(
             {
-                'reduce_input_to_hidden_0e': IrrepsLinear(
+                'reduce_input_to_hidden': IrrepsLinear(
                     irreps_x,
-                    hidden_irreps_E,
+                    hidden_irreps,
                     data_key_in=KEY.NODE_FEATURE,
-                    data_key_out=KEY.NODE_FEATURE_E,
                     biases=config[KEY.USE_BIAS_IN_LINEAR],
                 ),
-                'reduce_hidden_to_energy_0e': IrrepsLinear(
-                    hidden_irreps_E,
-                    Irreps([(1, (0, 1))]),
-                    data_key_in=KEY.NODE_FEATURE_E,
-                    data_key_out=KEY.SCALED_ATOMIC_ENERGY,
-                    biases=config[KEY.USE_BIAS_IN_LINEAR],
-                ),
-                'reduce_input_to_hidden_1o': IrrepsLinear(
-                    irreps_x,
-                    hidden_irreps_F,
+                'reduce_hidden_to_EFS': IrrepsLinear(
+                    hidden_irreps,
+                    Irreps([(1, (0, 1))]+[(1, (1, -1))]+[(1, (1, -1))]),
                     data_key_in=KEY.NODE_FEATURE,
-                    data_key_out=KEY.NODE_FEATURE_F,
-                    biases=config[KEY.USE_BIAS_IN_LINEAR],
-                ),
-                'reduce_hidden_to_force_1o': IrrepsLinear(
-                    hidden_irreps_F,
-                    Irreps([(1, (1, -1))]),
-                    data_key_in=KEY.NODE_FEATURE_F,
-                    data_key_out=KEY.SCALED_ATOMIC_FORCE,
-                    biases=config[KEY.USE_BIAS_IN_LINEAR],
-                ),
-                'reduce_input_to_hidden_3x1o': IrrepsLinear(
-                    irreps_x,
-                    hidden_irreps_S,
-                    data_key_in=KEY.NODE_FEATURE,
-                    data_key_out=KEY.NODE_FEATURE_S,
-                    biases=config[KEY.USE_BIAS_IN_LINEAR],
-                ),
-                'reduce_hidden_to_stress_3x1o': IrrepsLinear(
-                    hidden_irreps_S,
-                    Irreps([(1, (1, -1))]),
-                    data_key_in=KEY.NODE_FEATURE_S,
-                    data_key_out=KEY.SCALED_ATOMIC_STRESS,
                     biases=config[KEY.USE_BIAS_IN_LINEAR],
                 ),
             }
-        ) # training, inference, 
-          # IrrepsLinear
+        )
+        
     else: 
         act = _const.ACTIVATION[config[KEY.READOUT_FCN_ACTIVATION]]
         hidden_neurons = config[KEY.READOUT_FCN_HIDDEN_NEURONS]
@@ -383,7 +352,7 @@ def build_E3_equivariant_model(config: dict, parallel=False):
             parity_mode = 'full'
             fix_multiplicity = False
             if t == num_convolution_layer - 1:
-                lmax_node = 1
+                lmax_node = 2
                 parity_mode = 'direct'
             irreps_out_tp = util.infer_irreps_out(
                 irreps_x,  # type: ignore
@@ -417,27 +386,23 @@ def build_E3_equivariant_model(config: dict, parallel=False):
 
     layers.update(init_feature_reduce(config, irreps_x))
 
+    split_module = SplitEFS()
+    ES_module = DirectEnergyStressOutput()
+    grad_key = ES_module.get_grad_key()
     layers.update(
         {
+            'split_output': split_module,
             'rescale_atomic_energy': init_shift_scale(config),
-            'reduce_total_energy': AtomReduce(
-                data_key_in=KEY.ATOMIC_ENERGY,
-                data_key_out=KEY.PRED_TOTAL_ENERGY,
-                mode='energy',
-            ),
-            'reduce_total_stress': AtomReduce(
-                data_key_in=KEY.ATOMIC_STRESS,
-                data_key_out=KEY.PRED_STRESS,
-                mode='stress',
-            ),
+            'reduce_total_ES': AtomReduce(),
+            'ES_output': ES_module,
         }
     )
-
+    
     common_args = {
         'cutoff': cutoff,
         'type_map': config[KEY.TYPE_MAP],
         'eval_type_map': True if not parallel else False,
-        # 'data_key_grad': grad_key,
+        'data_key_grad': grad_key,
     }
 
     if parallel:

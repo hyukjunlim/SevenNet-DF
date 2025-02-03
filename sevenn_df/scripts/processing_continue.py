@@ -3,9 +3,9 @@ import warnings
 
 import torch
 
-import sevenn._keys as KEY
-import sevenn.util as util
-from sevenn.sevenn_logger import Logger
+import sevenn_df._keys as KEY
+import sevenn_df.util as util
+from sevenn_df.sevenn_logger import Logger
 
 
 def processing_continue_v2(config):  # simpler

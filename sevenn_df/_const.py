@@ -4,8 +4,8 @@ from typing import Dict
 
 import torch
 
-import sevenn._keys as KEY
-from sevenn.nn.activation import ShiftedSoftPlus
+import sevenn_df._keys as KEY
+from sevenn_df.nn.activation import ShiftedSoftPlus
 
 NUM_UNIV_ELEMENT = 119  # Z = 0 ~ 118
 

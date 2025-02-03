@@ -11,11 +11,11 @@ from ase.data import chemical_symbols
 from ase.io import write
 from tqdm import tqdm
 
-import sevenn._keys as KEY
-import sevenn.train.dataload as dataload
-import sevenn.util as util
-from sevenn._const import NUM_UNIV_ELEMENT
-from sevenn.atom_graph_data import AtomGraphData
+import sevenn_df._keys as KEY
+import sevenn_df.train.dataload as dataload
+import sevenn_df.util as util
+from sevenn_df._const import NUM_UNIV_ELEMENT
+from sevenn_df.atom_graph_data import AtomGraphData
 
 
 class SevenNetAtomsDataset(torch.utils.data.Dataset):
@@ -218,7 +218,7 @@ def from_config(
     working_dir: str = os.getcwd(),
     dataset_keys: Optional[list[str]] = None,
 ):
-    from sevenn.sevenn_logger import Logger
+    from sevenn_df.sevenn_logger import Logger
 
     log = Logger()
     if dataset_keys is None:

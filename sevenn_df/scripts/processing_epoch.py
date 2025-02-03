@@ -4,10 +4,10 @@ from typing import Optional
 
 import torch
 
-import sevenn._keys as KEY
-from sevenn.error_recorder import ErrorRecorder
-from sevenn.sevenn_logger import Logger
-from sevenn.train.trainer import Trainer
+import sevenn_df._keys as KEY
+from sevenn_df.error_recorder import ErrorRecorder
+from sevenn_df.sevenn_logger import Logger
+from sevenn_df.train.trainer import Trainer
 
 
 def processing_epoch_v2(
@@ -24,7 +24,7 @@ def processing_epoch_v2(
     write_csv: bool = True,
     working_dir: Optional[str] = None,
 ):
-    from sevenn.util import unique_filepath
+    from sevenn_df.util import unique_filepath
 
     log = Logger()
     write_csv = write_csv and log.rank == 0

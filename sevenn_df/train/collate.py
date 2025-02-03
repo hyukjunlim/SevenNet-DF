@@ -3,7 +3,7 @@ from typing import Any, List, Optional, Sequence
 from ase.atoms import Atoms
 from torch_geometric.loader.dataloader import Collater
 
-from sevenn.atom_graph_data import AtomGraphData
+from sevenn_df.atom_graph_data import AtomGraphData
 
 from .dataload import atoms_to_graph
 

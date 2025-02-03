@@ -57,17 +57,20 @@ SCALED_ENERGY: Final[str] = 'scaled_total_energy'
 # general outputs of models
 SCALED_ATOMIC_ENERGY: Final[str] = 'scaled_atomic_energy'
 ATOMIC_ENERGY: Final[str] = 'atomic_energy'
-PRED_TOTAL_ENERGY: Final[str] = 'inferred_total_energy'
+PRED_ENERGY: Final[str] = 'inferred_total_energy'
 
 PRED_PER_ATOM_ENERGY: Final[str] = 'inferred_per_atom_energy'
 PER_ATOM_ENERGY: Final[str] = 'per_atom_energy'
 
-SCALED_ATOMIC_FORCE: Final[str] = 'scaled_force'
+SCALED_ATOMIC_FORCE: Final[str] = 'scaled_atomic_force'
+ATOMIC_FORCE: Final[str] = 'atomic_force'
 PRED_FORCE: Final[str] = 'inferred_force'
+PRED_FORCE_DRV: Final[str] = 'inferred_force_from_drv'
 
 SCALED_ATOMIC_STRESS: Final[str] = 'scaled_atomic_stress'
 ATOMIC_STRESS: Final[str] = 'atomic_stress'
 PRED_STRESS: Final[str] = 'inferred_stress'
+PRED_STRESS_DRV: Final[str] = 'inferred_stress_from_drv'
 
 # very general data property for AtomGraphData
 NUM_ATOMS: Final[str] = 'num_atoms'  # int

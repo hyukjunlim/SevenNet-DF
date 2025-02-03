@@ -4,7 +4,7 @@ from typing import Any, Callable, List, Optional, Tuple
 import torch
 import torch.distributed as dist
 
-import sevenn._keys as KEY
+import sevenn_df._keys as KEY
 
 from .atom_graph_data import AtomGraphData
 from .train.optim import loss_dict
@@ -13,14 +13,14 @@ _ERROR_TYPES = {
     'TotalEnergy': {
         'name': 'Energy',
         'ref_key': KEY.ENERGY,
-        'pred_key': KEY.PRED_TOTAL_ENERGY,
+        'pred_key': KEY.PRED_ENERGY,
         'unit': 'eV',
         'vdim': 1,
     },
     'Energy': {  # by default per-atom for energy
         'name': 'Energy',
         'ref_key': KEY.ENERGY,
-        'pred_key': KEY.PRED_TOTAL_ENERGY,
+        'pred_key': KEY.PRED_ENERGY,
         'unit': 'eV/atom',
         'per_atom': True,
         'vdim': 1,

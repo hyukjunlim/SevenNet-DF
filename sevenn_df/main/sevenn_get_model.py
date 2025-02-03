@@ -1,7 +1,7 @@
 import argparse
 import os
 
-from sevenn import __version__
+from sevenn_df import __version__
 
 description_get_model = (
     f'sevenn version={__version__}, sevenn_get_model.'

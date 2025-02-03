@@ -22,8 +22,8 @@ from ase.utils import string2index
 from braceexpand import braceexpand
 from tqdm import tqdm
 
-import sevenn._keys as KEY
-from sevenn.atom_graph_data import AtomGraphData
+import sevenn_df._keys as KEY
+from sevenn_df.atom_graph_data import AtomGraphData
 
 from .dataset import AtomGraphDataset
 

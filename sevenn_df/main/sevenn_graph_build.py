@@ -4,7 +4,7 @@ import os
 import sys
 from datetime import datetime
 
-from sevenn import __version__
+from sevenn_df import __version__
 
 description = (
     f'sevenn version={__version__}, sevenn_graph_build.\n'
@@ -23,8 +23,8 @@ legacy_help = 'build legacy .sevenn_data'
 
 
 def run(args):
-    import sevenn.scripts.graph_build as graph_build
-    from sevenn.sevenn_logger import Logger
+    import sevenn_df.scripts.graph_build as graph_build
+    from sevenn_df.sevenn_logger import Logger
 
     source = glob.glob(args.source)
     cutoff = args.cutoff

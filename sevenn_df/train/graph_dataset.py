@@ -14,13 +14,13 @@ from torch_geometric.data import Data
 from torch_geometric.data.in_memory_dataset import InMemoryDataset
 from tqdm import tqdm
 
-import sevenn._keys as KEY
-import sevenn.train.dataload as dataload
-import sevenn.util as util
-from sevenn import __version__
-from sevenn._const import NUM_UNIV_ELEMENT
-from sevenn.atom_graph_data import AtomGraphData
-from sevenn.sevenn_logger import Logger
+import sevenn_df._keys as KEY
+import sevenn_df.train.dataload as dataload
+import sevenn_df.util as util
+from sevenn_df import __version__
+from sevenn_df._const import NUM_UNIV_ELEMENT
+from sevenn_df.atom_graph_data import AtomGraphData
+from sevenn_df.sevenn_logger import Logger
 
 if torch.__version__.split()[0] >= '2.4.0':
     # load graph without error
@@ -371,7 +371,7 @@ class SevenNetGraphDataset(InMemoryDataset):
     @staticmethod
     def _read_sevenn_data(filename: str) -> tuple[list[AtomGraphData], float]:
         # backward compatibility
-        from sevenn.train.dataset import AtomGraphDataset
+        from sevenn_df.train.dataset import AtomGraphDataset
 
         dataset = torch.load(filename, map_location='cpu', weights_only=False)
         if isinstance(dataset, AtomGraphDataset):

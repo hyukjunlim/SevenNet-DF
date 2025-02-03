@@ -7,8 +7,8 @@ from e3nn.nn import FullyConnectedNet
 from e3nn.o3 import Irreps, Linear, FullyConnectedTensorProduct
 from e3nn.util.jit import compile_mode
 
-import sevenn._keys as KEY
-from sevenn._const import AtomGraphDataType
+import sevenn_df._keys as KEY
+from sevenn_df._const import AtomGraphDataType
 
 
 @compile_mode('script')
@@ -48,45 +48,34 @@ class AtomReduce(nn.Module):
 
     def __init__(
         self,
-        data_key_in: str,
-        data_key_out: str,
+        data_key_in: list = [KEY.ATOMIC_ENERGY, KEY.ATOMIC_STRESS],
+        data_key_out: list = [KEY.PRED_ENERGY, KEY.PRED_STRESS],
         reduce: str = 'sum',
         constant: float = 1.0,
-        data_key_cell_volume: str = KEY.CELL_VOLUME,
-        mode: str = 'energy',
     ):
         super().__init__()
 
-        self.key_input = data_key_in
-        self.key_output = data_key_out
+        self.key_input_E, self.key_input_S = data_key_in
+        self.key_output_E, self.key_output_S = data_key_out
         self.constant = constant
         self.reduce = reduce
-        self.mode = mode
-        self.key_cell_volume = data_key_cell_volume
 
         # controlled by the upper most wrapper 'AtomGraphSequential'
         self._is_batch_data = True
 
     def forward(self, data: AtomGraphDataType) -> AtomGraphDataType:
-        volume = data[self.key_cell_volume]
-        if self._is_batch_data:
-            src = data[self.key_input]
-            src_shape = src.shape
-            size = int(data[KEY.BATCH].max()) + 1
-            output = torch.zeros(
-                (size, *src_shape[1:]), dtype=src.dtype, device=src.device
-            )
-            output.scatter_reduce_(0, data[KEY.BATCH].unsqueeze(-1).expand_as(src), src, reduce='sum')
-            if self.mode == 'energy':
-                output = output.squeeze(1)
-            elif self.mode == 'stress':
-                output = torch.einsum('bi,bj->bij', output, output).reshape(size, 9)[:, [0, 4, 8, 1, 5, 2]] / volume.view(-1, 1)
-            data[self.key_output] = output * self.constant
-        else:
-            output = torch.sum(data[self.key_input], dim=0)
-            if self.mode == 'stress':
-                output = torch.einsum('i,j->ij', output, output).reshape(9)[[0, 4, 8, 1, 5, 2]] / volume
-            data[self.key_output] = output * self.constant
+        for _in, _out in zip([self.key_input_E, self.key_input_S], [self.key_output_E, self.key_output_S]):
+            if self._is_batch_data:
+                src = data[_in]
+                src_shape = src.shape
+                size = int(data[KEY.BATCH].max()) + 1
+                output = torch.zeros(
+                    (size, *src_shape[1:]), dtype=src.dtype, device=src.device
+                )
+                output.scatter_reduce_(0, data[KEY.BATCH].unsqueeze(-1).expand_as(src), src, reduce='sum')
+                data[_out] = output * self.constant
+            else:
+                data[_out] = torch.sum(data[_in], dim=0) * self.constant
             
         return data
 

@@ -3,8 +3,8 @@ from typing import Optional
 import torch
 import torch_geometric.data
 
-import sevenn._keys as KEY
-import sevenn.util
+import sevenn_df._keys as KEY
+import sevenn_df.util
 
 
 class AtomGraphData(torch_geometric.data.Data):
@@ -71,5 +71,5 @@ class AtomGraphData(torch_geometric.data.Data):
             if k == KEY.CELL_SHIFT:
                 dct[k] = torch.Tensor(v)  # this is special
             else:
-                dct[k] = sevenn.util.dtype_correct(v)
+                dct[k] = sevenn_df.util.dtype_correct(v)
         return AtomGraphData(**dct)

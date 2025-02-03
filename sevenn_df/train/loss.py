@@ -1,8 +1,10 @@
 from typing import Any, Callable, Dict, Optional
 
+import math
 import torch
+import torch.nn.functional as F
 
-import sevenn._keys as KEY
+import sevenn_df._keys as KEY
 
 
 class LossDefinition:
@@ -54,8 +56,7 @@ class LossDefinition:
         """
         if self.criterion is None:
             raise NotImplementedError('LossDefinition has no criterion.')
-        pred, ref = self._preprocess(batch_data, model)
-        return self.criterion(pred, ref)
+        return self.criterion(*self._preprocess(batch_data, model))
 
 
 class PerAtomEnergyLoss(LossDefinition):
@@ -69,7 +70,7 @@ class PerAtomEnergyLoss(LossDefinition):
         unit: str = 'eV/atom',
         criterion: Optional[Callable] = None,
         ref_key: str = KEY.ENERGY,
-        pred_key: str = KEY.PRED_TOTAL_ENERGY,
+        pred_key: str = KEY.PRED_ENERGY,
     ):
         super().__init__(
             name=name,
@@ -158,7 +159,146 @@ class StressLoss(LossDefinition):
             torch.reshape(batch_data[self.ref_key] * self.TO_KB, (-1,)),
         )
 
+class ConsistencyForceLoss(LossDefinition):
+    """
+    Loss for Consistency of Force
+    """
 
+    def __init__(
+        self,
+        name: str = 'ConsistencyForce',
+        unit: str = 'eV/A',
+        criterion: Optional[Callable] = None,
+        ref_key: str = KEY.PRED_FORCE_DRV,
+        pred_key: str = KEY.FORCE,
+    ):
+        super().__init__(
+            name=name,
+            unit=unit,
+            criterion=criterion,
+            ref_key=ref_key,
+            pred_key=pred_key
+        )
+
+    def _preprocess(
+        self,
+        batch_data: Dict[str, Any],
+        model: Optional[Callable] = None
+    ):
+        assert isinstance(self.pred_key, str) and isinstance(self.ref_key, str)
+        return (
+            torch.reshape(batch_data[self.pred_key], (-1,)),
+            torch.reshape(batch_data[self.ref_key], (-1,)),
+        )
+
+class ConsistencyForceLoss2(LossDefinition):
+    """
+    Loss for Consistency of Force
+    """
+
+    def __init__(
+        self,
+        name: str = 'ConsistencyForce2',
+        unit: str = 'eV/A',
+        criterion: Optional[Callable] = None,
+        ref_key: str = KEY.PRED_FORCE_DRV,
+        pred_key: str = KEY.PRED_FORCE,
+    ):
+        super().__init__(
+            name=name,
+            unit=unit,
+            criterion=criterion,
+            ref_key=ref_key,
+            pred_key=pred_key
+        )
+
+    def _preprocess(
+        self,
+        batch_data: Dict[str, Any],
+        model: Optional[Callable] = None
+    ):
+        assert isinstance(self.pred_key, str) and isinstance(self.ref_key, str)
+        return (
+            torch.reshape(batch_data[self.pred_key], (-1,)),
+            torch.reshape(batch_data[self.ref_key], (-1,)),
+        )
+
+class ConsistencyStressLoss(LossDefinition):
+    """
+    Loss for Consistency for Stress this is kbar
+    """
+
+    def __init__(
+        self,
+        name: str = 'ConsistencyStress',
+        unit: str = 'kbar',
+        criterion: Optional[Callable] = None,
+        ref_key: str = KEY.PRED_STRESS_DRV,
+        pred_key: str = KEY.STRESS,
+    ):
+        super().__init__(
+            name=name,
+            unit=unit,
+            criterion=criterion,
+            ref_key=ref_key,
+            pred_key=pred_key
+        )
+        self.TO_KB = 1602.1766208  # eV/A^3 to kbar
+
+    def _preprocess(
+        self,
+        batch_data: Dict[str, Any],
+        model: Optional[Callable] = None
+    ):
+        assert isinstance(self.pred_key, str) and isinstance(self.ref_key, str)
+        return (
+            torch.reshape(batch_data[self.pred_key] * self.TO_KB, (-1,)),
+            torch.reshape(batch_data[self.ref_key] * self.TO_KB, (-1,)),
+        )
+
+class ArcForce(LossDefinition):
+    """
+    Cosine triplet loss for force
+    """
+    def __init__(
+        self, 
+        name: str = 'Force',
+        unit: str = 'eV/A',
+        criterion: Optional[Callable] = torch.nn.MarginRankingLoss(margin=0.3),
+        # criterion: Optional[Callable] = torch.nn.MarginRankingLoss(margin=math.pi * 0.75),
+        ref_key: str = KEY.FORCE,
+        pred_key: list = [KEY.PRED_FORCE, KEY.PRED_FORCE_DRV],
+    ):
+        super().__init__(
+            name=name,
+            unit=unit,
+            criterion=criterion,
+            ref_key=ref_key,
+            pred_key=pred_key,
+        )
+    
+    def _preprocess(
+        self,
+        batch_data: Dict[str, Any],
+        model: Optional[Callable] = None
+    ):
+        assert all(isinstance(i, str) for i in self.pred_key) and isinstance(self.ref_key, str)
+        
+        anchor = batch_data[self.ref_key]
+        positive = batch_data[self.pred_key[0]]
+        negative = batch_data[self.pred_key[1]] * (-1)
+        
+        a_p_cos = 1 - F.cosine_similarity(anchor, positive)
+        # a_p_cos = torch.acos(F.cosine_similarity(anchor, positive))
+        a_n_cos = 1 - F.cosine_similarity(anchor, negative)
+        # a_n_cos = torch.acos(F.cosine_similarity(anchor, negative))
+        
+        return (
+            torch.reshape(a_p_cos, (-1,)),
+            torch.reshape(a_n_cos, (-1,)),
+            torch.reshape(torch.tensor([-1], device=a_p_cos.device), (-1,))
+        )
+        
 def get_loss_functions_from_config(config: Dict[str, Any]):
     from sevenn.train.optim import loss_dict
 
@@ -170,12 +310,16 @@ def get_loss_functions_from_config(config: Dict[str, Any]):
     except KeyError:
         loss_param = {}
     criterion = loss(**loss_param)
-
-    loss_functions.append((PerAtomEnergyLoss(), 1.0))
-    loss_functions.append((ForceLoss(), config[KEY.FORCE_WEIGHT]))
+    
+    # loss_functions.append((PerAtomEnergyLoss(), 1.0))
+    # loss_functions.append((ForceLoss(), config[KEY.FORCE_WEIGHT]))
+    # loss_functions.append((ConsistencyForceLoss(), config[KEY.FORCE_WEIGHT]))
+    # loss_functions.append((ConsistencyForceLoss2(), config[KEY.FORCE_WEIGHT]))
+    # loss_functions.append((ArcForce(), config[KEY.FORCE_WEIGHT] * 1e-2))
     if config[KEY.IS_TRAIN_STRESS]:
         loss_functions.append((StressLoss(), config[KEY.STRESS_WEIGHT]))
-
+        # loss_functions.append((ConsistencyStressLoss(), config[KEY.STRESS_WEIGHT]))
+        
     for loss_function, _ in loss_functions:
         if loss_function.criterion is None:
             loss_function.assign_criteria(criterion)

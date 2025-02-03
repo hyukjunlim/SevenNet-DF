@@ -6,9 +6,9 @@ import torch
 import torch.nn
 from ase.data import chemical_symbols
 
-import sevenn._keys as KEY
-from sevenn import __version__
-from sevenn.model_build import build_E3_equivariant_model
+import sevenn_df._keys as KEY
+from sevenn_df import __version__
+from sevenn_df.model_build import build_E3_equivariant_model
 
 
 # TODO: this is E3_equivariant specific
@@ -19,8 +19,8 @@ def deploy(model_state_dct, config, fname):
     If changes the behavior, and accordingly pair_e3gnn.cpp,
     we have to recompile LAMMPS (which I always want to procrastinate)
     """
-    from sevenn.nn.edge_embedding import EdgePreprocess
-    from sevenn.nn.force_output import ForceStressOutput
+    from sevenn_df.nn.edge_embedding import EdgePreprocess
+    from sevenn_df.nn.force_output import ForceStressOutput
 
     model = build_E3_equivariant_model(config)
     assert isinstance(model, torch.nn.Module)
