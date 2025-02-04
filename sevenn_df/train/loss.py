@@ -311,8 +311,8 @@ def get_loss_functions_from_config(config: Dict[str, Any]):
         loss_param = {}
     criterion = loss(**loss_param)
     
-    # loss_functions.append((PerAtomEnergyLoss(), 1.0))
-    # loss_functions.append((ForceLoss(), config[KEY.FORCE_WEIGHT]))
+    loss_functions.append((PerAtomEnergyLoss(), 1.0))
+    loss_functions.append((ForceLoss(), config[KEY.FORCE_WEIGHT]))
     # loss_functions.append((ConsistencyForceLoss(), config[KEY.FORCE_WEIGHT]))
     # loss_functions.append((ConsistencyForceLoss2(), config[KEY.FORCE_WEIGHT]))
     # loss_functions.append((ArcForce(), config[KEY.FORCE_WEIGHT] * 1e-2))

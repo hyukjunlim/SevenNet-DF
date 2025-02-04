@@ -48,15 +48,15 @@ class AtomReduce(nn.Module):
 
     def __init__(
         self,
-        data_key_in: list = [KEY.ATOMIC_ENERGY, KEY.ATOMIC_STRESS],
-        data_key_out: list = [KEY.PRED_ENERGY, KEY.PRED_STRESS],
+        data_key_in: str = KEY.ATOMIC_ENERGY,
+        data_key_out: str = KEY.PRED_ENERGY,
         reduce: str = 'sum',
         constant: float = 1.0,
     ):
         super().__init__()
 
-        self.key_input_E, self.key_input_S = data_key_in
-        self.key_output_E, self.key_output_S = data_key_out
+        self.key_input_E = data_key_in
+        self.key_output_E = data_key_out
         self.constant = constant
         self.reduce = reduce
 
@@ -64,7 +64,7 @@ class AtomReduce(nn.Module):
         self._is_batch_data = True
 
     def forward(self, data: AtomGraphDataType) -> AtomGraphDataType:
-        for _in, _out in zip([self.key_input_E, self.key_input_S], [self.key_output_E, self.key_output_S]):
+        for _in, _out in zip([self.key_input_E], [self.key_output_E]):
             if self._is_batch_data:
                 src = data[_in]
                 src_shape = src.shape

@@ -216,6 +216,7 @@ class DirectEnergyStressOutput(nn.Module):
         data_key_energy: str = KEY.PRED_ENERGY,
         data_key_force: str = KEY.PRED_FORCE,
         data_key_stress: str = KEY.PRED_STRESS,
+        data_key_atomic_stress: str = KEY.ATOMIC_STRESS,
         data_key_force_drv: str = KEY.PRED_FORCE_DRV,
         data_key_stress_drv: str = KEY.PRED_STRESS_DRV,
         data_key_cell_volume: str = KEY.CELL_VOLUME,
@@ -227,6 +228,7 @@ class DirectEnergyStressOutput(nn.Module):
         self.key_energy = data_key_energy
         self.key_force = data_key_force
         self.key_stress = data_key_stress
+        self.key_atomic_stress = data_key_atomic_stress
         self.key_force_drv = data_key_force_drv
         self.key_stress_drv = data_key_stress_drv
         self.key_cell_volume = data_key_cell_volume
@@ -253,7 +255,7 @@ class DirectEnergyStressOutput(nn.Module):
     def forward(self, data: AtomGraphDataType) -> AtomGraphDataType:
         volume = data[self.key_cell_volume]
         data[self.key_energy] = data[self.key_energy].squeeze(-1)
-        v = data[self.key_stress]
+        v = data[self.key_atomic_stress]
         
         if self._is_batch_data:
             # # Derivating method
@@ -314,11 +316,26 @@ class DirectEnergyStressOutput(nn.Module):
             # out = torch.zeros((size, 6), requires_grad=False)
             # out[:, 1:6] = out.view(size, -1)
             # voigt = torch.einsum("ba,cb->ca", self.cg_change_mat, out).reshape(size, 9)[:, [0, 4, 8, 1, 5, 2]]
-            voigt = torch.einsum('bi,bj->bij', v, v).reshape(size, 9)[:, [0, 4, 8, 1, 5, 2]]
-            data[self.key_stress] = voigt / volume.view(-1, 1)
+            
+            src = torch.einsum('bi,bj->bij', v, v).reshape(-1, 9)[:, [0, 4, 8, 1, 5, 2]]
+            src_shape = src.shape
+            size = int(data[KEY.BATCH].max()) + 1
+            output = torch.zeros(
+                (size, *src_shape[1:]), dtype=src.dtype, device=src.device
+            )
+            output.scatter_reduce_(0, data[KEY.BATCH].unsqueeze(-1).expand_as(src), src, reduce='sum')
+            data[self.key_stress] = output / volume.view(-1, 1)
+            print(volume, flush=True)
+            print(data[self.key_force])
+            print(v, flush=True)
+            print(data[self.key_stress], flush=True)
         else:
-            voigt = torch.einsum('i,j->ij', v, v).reshape(9)[[0, 4, 8, 1, 5, 2]]
-            data[self.key_stress] = voigt / volume
+            voigt = torch.einsum('ni,nj->nij', v, v).reshape(-1, 9)[[0, 4, 8, 1, 5, 2]]
+            data[self.key_stress] = torch.sum(voigt, dim=0) / volume
+            print(volume, flush=True)
+            print(data[self.key_force])
+            print(v, flush=True)
+            print(data[self.key_stress], flush=True)
         
         return data
       

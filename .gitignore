@@ -4,3 +4,13 @@ sevenn.egg-info
 *.swp
 dev.vim
 __pycache__/
+
+# sevennet_tutorial except the py code
+sevennet_tutorial/*
+!sevennet_tutorial/*.py
+!sevennet_tutorial/*.err
+!sevennet_tutorial/*.out
+
+# every folders in sevennet_tutorial, except results folder
+sevennet_tutorial/*/
+!sevennet_tutorial/results/
