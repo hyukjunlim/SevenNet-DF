@@ -114,27 +114,27 @@ for metric in train_recorder.metrics:
 from tqdm import tqdm
 
 valid_best = float('inf')
-total_epoch = 3    # you can increase this number for better performance.
+total_epoch = 50    # you can increase this number for better performance.
 pbar = tqdm(range(total_epoch))
 config = model_cfg  # to save config used in this tutorial.
 config.update(train_cfg)
 
-# for epoch in pbar:
-#   # trainer scans whole data from given loader, and updates error recorder with outputs.
-#   trainer.run_one_epoch(train_loader, is_train=True, error_recorder=train_recorder)
-#   trainer.run_one_epoch(valid_loader, is_train=False, error_recorder=valid_recorder)
-#   trainer.scheduler_step(valid_best) 
-#   train_err = train_recorder.epoch_forward()  # return averaged error over one epoch, then reset.
-#   valid_err = valid_recorder.epoch_forward()
+for epoch in pbar:
+  # trainer scans whole data from given loader, and updates error recorder with outputs.
+  trainer.run_one_epoch(train_loader, is_train=True, error_recorder=train_recorder)
+  trainer.run_one_epoch(valid_loader, is_train=False, error_recorder=valid_recorder)
+  trainer.scheduler_step(valid_best) 
+  train_err = train_recorder.epoch_forward()  # return averaged error over one epoch, then reset.
+  valid_err = valid_recorder.epoch_forward()
 
-#   # for print. train_err is a dictionary of {metric name with unit: error}
-#   err_str = 'Train: ' + '    '.join([f'{k}: {v:.3f}' for k, v in train_err.items()])
-#   err_str += '// Valid: ' + '    '.join([f'{k}: {v:.3f}' for k, v in valid_err.items()])
-#   pbar.set_description(err_str)
+  # for print. train_err is a dictionary of {metric name with unit: error}
+  err_str = 'Train: ' + '    '.join([f'{k}: {v:.3f}' for k, v in train_err.items()])
+  err_str += '// Valid: ' + '    '.join([f'{k}: {v:.3f}' for k, v in valid_err.items()])
+  pbar.set_description(err_str)
 
-#   if valid_err['TotalLoss'] < valid_best:  # saves best checkpoint. by comparing validation set total loss
-#     valid_best = valid_err['TotalLoss']
-#     trainer.write_checkpoint(os.path.join(working_dir, 'checkpoint_best.pth'), config=config, epoch=epoch)
+  if valid_err['TotalLoss'] < valid_best:  # saves best checkpoint. by comparing validation set total loss
+    valid_best = valid_err['TotalLoss']
+    trainer.write_checkpoint(os.path.join(working_dir, 'checkpoint_best.pth'), config=config, epoch=epoch)
 
 # load test model
 import torch
