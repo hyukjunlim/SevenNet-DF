@@ -55,8 +55,8 @@ model_cfg.update({'channel': 16, 'lmax': 2})
 model_cfg.update(util.chemical_species_preprocess([], universal=True))
 
 # tell model about statistics of dataset. kind of data standardization
-train_shift = dataset.per_atom_energy_mean
-train_scale = {'force': dataset.force_rms, 'stress': dataset.stress_rms}
+train_shift = {'E': dataset.per_atom_energy_mean, 'F': dataset.force_mean, 'S': dataset.stress_mean}
+train_scale = {'E': dataset.energy_rms, 'F': dataset.force_rms, 'S': dataset.stress_rms}
 train_conv_denominator = dataset.avg_num_neigh
 model_cfg.update({'shift': train_shift, 'scale': train_scale, 'conv_denominator': train_conv_denominator})
 print(model_cfg)
@@ -82,7 +82,7 @@ train_cfg.update({
   # 'scheduler': 'exponentiallr',
   # 'scheduler_param': {'gamma': 0.99},
   'force_loss_weight': 0.2,
-  'stress_loss_weight': 5e-4,
+  'stress_loss_weight': 1e-5,
 })
 
 # Initialize trainer. It implements common rountines for training.
