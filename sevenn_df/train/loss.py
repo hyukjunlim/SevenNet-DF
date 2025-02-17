@@ -255,6 +255,39 @@ class ConsistencyStressLoss(LossDefinition):
             torch.reshape(batch_data[self.pred_key] * self.TO_KB, (-1,)),
             torch.reshape(batch_data[self.ref_key] * self.TO_KB, (-1,)),
         )
+        
+class ConsistencyStressLoss2(LossDefinition):
+    """
+    Loss for Consistency for Stress this is kbar
+    """
+
+    def __init__(
+        self,
+        name: str = 'ConsistencyStress2',
+        unit: str = 'kbar',
+        criterion: Optional[Callable] = None,
+        ref_key: str = KEY.PRED_STRESS_DRV,
+        pred_key: str = KEY.PRED_STRESS,
+    ):
+        super().__init__(
+            name=name,
+            unit=unit,
+            criterion=criterion,
+            ref_key=ref_key,
+            pred_key=pred_key
+        )
+        self.TO_KB = 1602.1766208  # eV/A^3 to kbar
+
+    def _preprocess(
+        self,
+        batch_data: Dict[str, Any],
+        model: Optional[Callable] = None
+    ):
+        assert isinstance(self.pred_key, str) and isinstance(self.ref_key, str)
+        return (
+            torch.reshape(batch_data[self.pred_key] * self.TO_KB, (-1,)),
+            torch.reshape(batch_data[self.ref_key] * self.TO_KB, (-1,)),
+        )
 
 class ArcForce(LossDefinition):
     """
@@ -311,14 +344,17 @@ def get_loss_functions_from_config(config: Dict[str, Any]):
         loss_param = {}
     criterion = loss(**loss_param)
     
+    consistency_weight = 0.5
+    consistency2_weight = 0.1
     loss_functions.append((PerAtomEnergyLoss(), 1.0))
     loss_functions.append((ForceLoss(), config[KEY.FORCE_WEIGHT]))
-    # loss_functions.append((ConsistencyForceLoss(), config[KEY.FORCE_WEIGHT]))
-    # loss_functions.append((ConsistencyForceLoss2(), config[KEY.FORCE_WEIGHT]))
+    loss_functions.append((ConsistencyForceLoss(), config[KEY.FORCE_WEIGHT] * consistency_weight))
+    loss_functions.append((ConsistencyForceLoss2(), config[KEY.FORCE_WEIGHT] * consistency2_weight))
     # loss_functions.append((ArcForce(), config[KEY.FORCE_WEIGHT] * 1e-2))
     if config[KEY.IS_TRAIN_STRESS]:
         loss_functions.append((StressLoss(), config[KEY.STRESS_WEIGHT]))
-        # loss_functions.append((ConsistencyStressLoss(), config[KEY.STRESS_WEIGHT]))
+        loss_functions.append((ConsistencyStressLoss(), config[KEY.STRESS_WEIGHT] * consistency_weight))
+        loss_functions.append((ConsistencyStressLoss2(), config[KEY.STRESS_WEIGHT] * consistency2_weight))
         
     for loss_function, _ in loss_functions:
         if loss_function.criterion is None:

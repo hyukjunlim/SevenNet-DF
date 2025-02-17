@@ -83,8 +83,8 @@ def init_feature_reduce(config, irreps_x):
     # features per node to scalar per node
     layers = OrderedDict()
     if config[KEY.READOUT_AS_FCN] is False:
-        dim = irreps_x.dim // 8
-        hidden_irreps = Irreps([(dim, (0, 1))]+[(dim, (1, -1))]+[(dim, (1, -1))])
+        dim = irreps_x.dim // 18
+        hidden_irreps = Irreps([(dim, (0, 1))]+[(dim, (0, 1))]+[(dim, (1, -1))]+[(dim, (2, 1))])
         layers.update(
             {
                 'reduce_input_to_hidden': IrrepsLinear(
@@ -95,7 +95,7 @@ def init_feature_reduce(config, irreps_x):
                 ),
                 'reduce_hidden_to_EFS': IrrepsLinear(
                     hidden_irreps,
-                    Irreps([(1, (0, 1))]+[(1, (1, -1))]+[(1, (1, -1))]),
+                    Irreps([(1, (0, 1))]+[(1, (0, 1))]+[(1, (1, -1))]+[(1, (2, 1))]),
                     data_key_in=KEY.NODE_FEATURE,
                     biases=config[KEY.USE_BIAS_IN_LINEAR],
                 ),
@@ -120,7 +120,7 @@ def init_feature_reduce(config, irreps_x):
     return layers
 
 
-def init_shift_scale(config):
+def init_shift_scale(config, mode='EF'):
     shift_scale = []
     type_map = config[KEY.TYPE_MAP]
     # correct typing (I really want static python)
@@ -153,6 +153,7 @@ def init_shift_scale(config):
         shift=shift,
         scale=scale,
         train_shift_scale=config[KEY.TRAIN_SHIFT_SCALE],
+        mode=mode,
     )
 
 
@@ -392,9 +393,10 @@ def build_E3_equivariant_model(config: dict, parallel=False):
     layers.update(
         {
             'split_output': split_module,
-            'rescale_atomic_energy': init_shift_scale(config),
-            'reduce_total_ES': AtomReduce(),
+            'rescale_atomic_EF': init_shift_scale(config, mode='EF'),
+            'reduce_total_E': AtomReduce(),
             'ES_output': ES_module,
+            'rescale_atomic_S': init_shift_scale(config, mode='S'),
         }
     )
     

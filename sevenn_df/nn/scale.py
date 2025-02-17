@@ -18,36 +18,46 @@ class Rescale(nn.Module):
         self,
         shift: float,
         scale: dict,
-        data_key_in: list = [KEY.SCALED_ATOMIC_ENERGY, KEY.SCALED_ATOMIC_FORCE, KEY.SCALED_ATOMIC_STRESS],
-        data_key_out: list = [KEY.ATOMIC_ENERGY, KEY.PRED_FORCE, KEY.ATOMIC_STRESS],
+        data_key_in: list = [KEY.SCALED_ATOMIC_ENERGY, KEY.SCALED_ATOMIC_FORCE, KEY.SCALED_PRED_STRESS],
+        data_key_out: list = [KEY.ATOMIC_ENERGY, KEY.PRED_FORCE, KEY.PRED_STRESS],
         train_shift_scale: bool = False,
-        # data_key_cell_volume: str = KEY.CELL_VOLUME,
+        mode: str = 'EF',
+        data_key_cell_volume: str = KEY.CELL_VOLUME,
     ):
-        assert isinstance(shift, float) and all(isinstance(_, float) for _ in scale.values())
+        
+        assert all(isinstance(_, float) for _ in [shift['E'], shift['F'], shift['S'], scale['E'], scale['F'], scale['S']])
         super().__init__()
-        self.shift = nn.Parameter(
-            torch.FloatTensor([shift]), requires_grad=train_shift_scale
-        )
-        self.scale_force = nn.Parameter(
-            torch.FloatTensor([scale['force']]), requires_grad=train_shift_scale
-        )
-        self.scale_stress = nn.Parameter(
-            torch.FloatTensor([scale['stress']]), requires_grad=train_shift_scale
-        )
+        
+        self.scale_energy = nn.Parameter(torch.FloatTensor([scale['E']]), requires_grad=train_shift_scale)
+        self.shift_energy = nn.Parameter(torch.FloatTensor([shift['E']]), requires_grad=train_shift_scale)
+        
+        self.scale_force = nn.Parameter(torch.FloatTensor([scale['F']]), requires_grad=train_shift_scale)
+        self.shift_force = nn.Parameter(torch.FloatTensor([shift['F']]), requires_grad=train_shift_scale)
+        
+        self.scale_stress = nn.Parameter(torch.FloatTensor([scale['S']]), requires_grad=train_shift_scale)
+        self.shift_stress = nn.Parameter(torch.FloatTensor([shift['S']]), requires_grad=train_shift_scale)
+        
         self.key_input_E, self.key_input_F, self.key_input_S = data_key_in
         self.key_output_E, self.key_output_F, self.key_output_S = data_key_out
-        # self.key_cell_volume = data_key_cell_volume
-        # self._is_batch_data = True
+        self.mode = mode
+        self.key_cell_volume = data_key_cell_volume
+        self._is_batch_data = True
         
 
     def forward(self, data: AtomGraphDataType) -> AtomGraphDataType:
-        # volume = data[self.key_cell_volume]
-        # if self._is_batch_data:
-        #     volume = volume.view(-1, 1)
+        volume = data[self.key_cell_volume].view(-1, 1)
         
-        data[self.key_output_E] = data[self.key_input_E] * self.scale_force + self.shift
-        data[self.key_output_F] = data[self.key_input_F] * self.scale_force
-        data[self.key_output_S] = data[self.key_input_S] * (self.scale_stress) ** 0.5
+        if 'E' in self.mode:
+            data[self.key_output_E] = data[self.key_input_E] * self.scale_force + self.shift_energy
+        if 'F' in self.mode:
+            data[self.key_output_F] = data[self.key_input_F] * self.scale_force
+        if 'S' in self.mode:
+            x = self.shift_stress
+            shift_stress = torch.cat([x, x, x, torch.zeros(3, device=volume.device, dtype=volume.dtype)], dim=-1)
+            data[self.key_output_S] = data[self.key_input_S]
+            # data[self.key_output_S] = (data[self.key_input_S] * self.scale_stress + shift_stress) # / volume
+            if not self._is_batch_data:
+                data[self.key_output_S] = data[self.key_output_S].squeeze(0)
 
         return data
 

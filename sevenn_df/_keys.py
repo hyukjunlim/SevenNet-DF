@@ -68,10 +68,11 @@ PRED_FORCE: Final[str] = 'inferred_force'
 PRED_FORCE_DRV: Final[str] = 'inferred_force_from_drv'
 
 SCALED_ATOMIC_STRESS: Final[str] = 'scaled_atomic_stress'
-ATOMIC_STRESS: Final[str] = 'atomic_stress'
+SCALED_ATOMIC_STRESS_ISO: Final[str] = 'scaled_atomic_stress_iso'
+SCALED_ATOMIC_STRESS_ANISO: Final[str] = 'scaled_atomic_stress_aniso'
+SCALED_PRED_STRESS: Final[str] = 'scaled_pred_stress'
 PRED_STRESS: Final[str] = 'inferred_stress'
 PRED_STRESS_DRV: Final[str] = 'inferred_stress_from_drv'
-
 # very general data property for AtomGraphData
 NUM_ATOMS: Final[str] = 'num_atoms'  # int
 NUM_GHOSTS: Final[str] = 'num_ghosts'

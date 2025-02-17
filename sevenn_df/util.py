@@ -291,7 +291,7 @@ def infer_irreps_out(
         if drop_l is not False and l > drop_l:
             continue
         if parity_mode == 'direct':
-            if not (l == 0 and p == 1 or l == 1 and p == -1):
+            if not (l == 0 and p == 1 or l == 1 and p == -1 or l == 2 and p == 1):
                 continue
         elif parity_mode == 'even' and p == -1:
             continue

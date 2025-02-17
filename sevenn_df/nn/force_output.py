@@ -6,6 +6,7 @@ import sevenn_df._keys as KEY
 from sevenn_df._const import AtomGraphDataType
 
 from .util import _broadcast
+import math
 
 
 @compile_mode('script')
@@ -215,8 +216,9 @@ class DirectEnergyStressOutput(nn.Module):
         data_key_edge_idx: str = KEY.EDGE_IDX,
         data_key_energy: str = KEY.PRED_ENERGY,
         data_key_force: str = KEY.PRED_FORCE,
-        data_key_stress: str = KEY.PRED_STRESS,
-        data_key_atomic_stress: str = KEY.ATOMIC_STRESS,
+        data_key_stress: str = KEY.SCALED_PRED_STRESS,
+        data_key_atomic_stress_iso: str = KEY.SCALED_ATOMIC_STRESS_ISO,
+        data_key_atomic_stress_aniso: str = KEY.SCALED_ATOMIC_STRESS_ANISO,
         data_key_force_drv: str = KEY.PRED_FORCE_DRV,
         data_key_stress_drv: str = KEY.PRED_STRESS_DRV,
         data_key_cell_volume: str = KEY.CELL_VOLUME,
@@ -228,114 +230,116 @@ class DirectEnergyStressOutput(nn.Module):
         self.key_energy = data_key_energy
         self.key_force = data_key_force
         self.key_stress = data_key_stress
-        self.key_atomic_stress = data_key_atomic_stress
+        self.key_atomic_stress_iso = data_key_atomic_stress_iso
+        self.key_atomic_stress_aniso = data_key_atomic_stress_aniso
         self.key_force_drv = data_key_force_drv
         self.key_stress_drv = data_key_stress_drv
         self.key_cell_volume = data_key_cell_volume
         self._is_batch_data = True
         
-        # self.change_mat = torch.tensor(
-        #     [
-        #         [3 ** (-0.5), 0, 0, 0, 3 ** (-0.5), 0, 0, 0, 3 ** (-0.5)],
-        #         [0, 0, 0, 0, 0, 2 ** (-0.5), 0, -(2 ** (-0.5)), 0],
-        #         [0, 0, -(2 ** (-0.5)), 0, 0, 0, 2 ** (-0.5), 0, 0],
-        #         [0, 2 ** (-0.5), 0, -(2 ** (-0.5)), 0, 0, 0, 0, 0],
-        #         [0, 0, 0.5**0.5, 0, 0, 0, 0.5**0.5, 0, 0],
-        #         [0, 2 ** (-0.5), 0, 2 ** (-0.5), 0, 0, 0, 0, 0],
-        #         [-(6 ** (-0.5)), 0, 0, 0, 2 * 6 ** (-0.5), 0, 0, 0, -(6 ** (-0.5))],
-        #         [0, 0, 0, 0, 0, 2 ** (-0.5), 0, 2 ** (-0.5), 0],
-        #         [-(2 ** (-0.5)), 0, 0, 0, 0, 0, 0, 0, 2 ** (-0.5)],
-        #     ],
-        #     device=device
-        # )
-    
     def get_grad_key(self):
         return self.key_edge
     
     def forward(self, data: AtomGraphDataType) -> AtomGraphDataType:
         volume = data[self.key_cell_volume]
         data[self.key_energy] = data[self.key_energy].squeeze(-1)
-        v = data[self.key_atomic_stress]
+        iso = data[self.key_atomic_stress_iso]
+        aniso = data[self.key_atomic_stress_aniso]
+        A = torch.tensor([
+            [0.0, 0.0, -1/math.sqrt(6), 0.0, -1/math.sqrt(2)],
+            [0.0, 0.0,  math.sqrt(2)/math.sqrt(3), 0.0,  0.0],
+            [0.0, 0.0, -1/math.sqrt(6), 0.0, 1/math.sqrt(2)],
+            [0.0, 1/math.sqrt(2), 0.0, 0.0, 0.0],
+            [0.0, 0.0, 0.0, 0.0, 1/math.sqrt(2)],
+            [1/math.sqrt(2), 0.0, 0.0, 0.0, 0.0]
+        ], dtype=aniso.dtype, device=aniso.device)
+        tot_num = torch.sum(data[KEY.NUM_ATOMS])  # ? item?
         
         if self._is_batch_data:
-            # # Derivating method
-            # tot_num = torch.sum(data[KEY.NUM_ATOMS])  # ? item?
-            # rij = data[self.key_edge]
-            # energy = [(data[self.key_energy]).sum()]
-            # edge_idx = data[self.key_edge_idx]
+            # Derivating method
+            rij = data[self.key_edge]
+            energy = [(data[self.key_energy]).sum()]
+            edge_idx = data[self.key_edge_idx]
 
-            # grad = torch.autograd.grad(
-            #     energy,
-            #     [rij],
-            #     create_graph=self.training,
-            #     allow_unused=True
-            # )
+            grad = torch.autograd.grad(
+                energy,
+                [rij],
+                create_graph=self.training,
+                allow_unused=True
+            )
 
-            # # make grad is not Optional[Tensor]
-            # fij = grad[0]
+            # make grad is not Optional[Tensor]
+            fij = grad[0]
 
-            # if fij is not None:
-            #     # compute force
-            #     pf = torch.zeros(tot_num, 3, dtype=fij.dtype, device=fij.device)
-            #     nf = torch.zeros(tot_num, 3, dtype=fij.dtype, device=fij.device)
-            #     _edge_src = _broadcast(edge_idx[0], fij, 0)
-            #     _edge_dst = _broadcast(edge_idx[1], fij, 0)
-            #     pf.scatter_reduce_(0, _edge_src, fij, reduce='sum')
-            #     nf.scatter_reduce_(0, _edge_dst, fij, reduce='sum')
-            #     data[self.key_force_drv] = pf - nf
+            if fij is not None:
+                # compute force
+                pf = torch.zeros(tot_num, 3, dtype=fij.dtype, device=fij.device)
+                nf = torch.zeros(tot_num, 3, dtype=fij.dtype, device=fij.device)
+                _edge_src = _broadcast(edge_idx[0], fij, 0)
+                _edge_dst = _broadcast(edge_idx[1], fij, 0)
+                pf.scatter_reduce_(0, _edge_src, fij, reduce='sum')
+                nf.scatter_reduce_(0, _edge_dst, fij, reduce='sum')
+                data[self.key_force_drv] = pf - nf
 
-            #     # compute virial
-            #     diag = rij * fij
-            #     s12 = rij[..., 0] * fij[..., 1]
-            #     s23 = rij[..., 1] * fij[..., 2]
-            #     s31 = rij[..., 2] * fij[..., 0]
-            #     # cat last dimension
-            #     _virial = torch.cat([
-            #         diag,
-            #         s12.unsqueeze(-1),
-            #         s23.unsqueeze(-1),
-            #         s31.unsqueeze(-1)
-            #     ], dim=-1)
+                # compute virial
+                diag = rij * fij
+                s12 = rij[..., 0] * fij[..., 1]
+                s23 = rij[..., 1] * fij[..., 2]
+                s31 = rij[..., 2] * fij[..., 0]
+                # cat last dimension
+                _virial = torch.cat([
+                    diag,
+                    s12.unsqueeze(-1),
+                    s23.unsqueeze(-1),
+                    s31.unsqueeze(-1)
+                ], dim=-1)
 
-            #     _s = torch.zeros(tot_num, 6, dtype=fij.dtype, device=fij.device)
-            #     _edge_dst6 = _broadcast(edge_idx[1], _virial, 0)
-            #     _s.scatter_reduce_(0, _edge_dst6, _virial, reduce='sum')
+                _s = torch.zeros(tot_num, 6, dtype=fij.dtype, device=fij.device)
+                _edge_dst6 = _broadcast(edge_idx[1], _virial, 0)
+                _s.scatter_reduce_(0, _edge_dst6, _virial, reduce='sum')
 
-            #     batch = data[KEY.BATCH]  # for deploy, must be defined first
-            #     nbatch = int(batch.max().cpu().item()) + 1
-            #     sout = torch.zeros(
-            #         (nbatch, 6), dtype=_virial.dtype, device=_virial.device
-            #     )
-            #     _batch = _broadcast(batch, _s, 0)
-            #     sout.scatter_reduce_(0, _batch, _s, reduce='sum')
-            #     data[self.key_stress_drv] =\
-            #         torch.neg(sout) / volume.unsqueeze(-1)
+                batch = data[KEY.BATCH]  # for deploy, must be defined first
+                nbatch = int(batch.max().cpu().item()) + 1
+                sout = torch.zeros(
+                    (nbatch, 6), dtype=_virial.dtype, device=_virial.device
+                )
+                _batch = _broadcast(batch, _s, 0)
+                sout.scatter_reduce_(0, _batch, _s, reduce='sum')
+                data[self.key_stress_drv] =\
+                    torch.neg(sout) / volume.unsqueeze(-1)
                     
-            # Direct method
+            ### Direct method
             size = volume.shape[0]
-            # out = torch.zeros((size, 6), requires_grad=False)
-            # out[:, 1:6] = out.view(size, -1)
-            # voigt = torch.einsum("ba,cb->ca", self.cg_change_mat, out).reshape(size, 9)[:, [0, 4, 8, 1, 5, 2]]
             
-            src = torch.einsum('bi,bj->bij', v, v).reshape(-1, 9)[:, [0, 4, 8, 1, 5, 2]]
+            ## 1
+            # src = torch.einsum('bi,bj->bij', v, v).reshape(-1, 9)[:, [0, 4, 8, 1, 5, 2]]
+            # src_shape = src.shape
+            # size = int(data[KEY.BATCH].max()) + 1
+            # output = torch.zeros(
+            #     (size, *src_shape[1:]), dtype=src.dtype, device=src.device
+            # )
+            # output.scatter_reduce_(0, data[KEY.BATCH].unsqueeze(-1).expand_as(src), src, reduce='sum')
+            
+            ## 2
+            src = aniso @ A.T + torch.cat([iso, iso, iso, torch.zeros(tot_num, 3, dtype=aniso.dtype, device=aniso.device)], dim=-1)
             src_shape = src.shape
             size = int(data[KEY.BATCH].max()) + 1
             output = torch.zeros(
                 (size, *src_shape[1:]), dtype=src.dtype, device=src.device
             )
             output.scatter_reduce_(0, data[KEY.BATCH].unsqueeze(-1).expand_as(src), src, reduce='sum')
-            data[self.key_stress] = output / volume.view(-1, 1)
-            print(volume, flush=True)
-            print(data[self.key_force])
-            print(v, flush=True)
-            print(data[self.key_stress], flush=True)
+            
+            # result
+            data[self.key_stress] = output
         else:
-            voigt = torch.einsum('ni,nj->nij', v, v).reshape(-1, 9)[[0, 4, 8, 1, 5, 2]]
-            data[self.key_stress] = torch.sum(voigt, dim=0) / volume
-            print(volume, flush=True)
-            print(data[self.key_force])
-            print(v, flush=True)
-            print(data[self.key_stress], flush=True)
+            ## 1
+            # output = torch.einsum('ni,nj->nij', v, v).reshape(-1, 9)[:, [0, 4, 8, 1, 5, 2]]
+            
+            ## 2
+            output = aniso @ A.T + torch.cat([iso, iso, iso, torch.zeros(tot_num, 3, dtype=aniso.dtype, device=aniso.device)], dim=-1)
+            
+            # result
+            data[self.key_stress] = torch.sum(output, dim=0)
         
         return data
       
@@ -386,22 +390,23 @@ class SplitEFS(nn.Module):
         data_key_feature: str = KEY.NODE_FEATURE,
         data_key_energy: str = KEY.SCALED_ATOMIC_ENERGY,
         data_key_force: str = KEY.SCALED_ATOMIC_FORCE,
-        data_key_stress: str = KEY.SCALED_ATOMIC_STRESS,
+        data_key_stress_iso: str = KEY.SCALED_ATOMIC_STRESS_ISO,
+        data_key_stress_aniso: str = KEY.SCALED_ATOMIC_STRESS_ANISO,
     ):
 
         super().__init__()
         self.key_feature = data_key_feature
         self.key_energy = data_key_energy
         self.key_force = data_key_force
-        self.key_stress = data_key_stress
+        self.key_stress_iso = data_key_stress_iso
+        self.key_stress_aniso = data_key_stress_aniso
 
     def forward(self, data: AtomGraphDataType) -> AtomGraphDataType:
         feature = data[self.key_feature]
         
         data[self.key_energy] = feature[..., :1]
-        data[self.key_force] = feature[..., 1:4]
-        data[self.key_stress] = feature[..., 4:7]
-        # data[self.key_force] = feature[..., 2:5]
-        # data[self.key_stress] = feature[..., 1:2] + feature[..., 5:10]
+        data[self.key_stress_iso] = feature[..., 1:2]
+        data[self.key_force] = feature[..., 2:5]
+        data[self.key_stress_aniso] = feature[..., 5:]
         
         return data

@@ -84,8 +84,12 @@ def _run_stat(
             )
 
     stats.update({'num_neighbor': {'_array': n_neigh}})
+    
     for y, dct in stats.items():
-        array = torch.cat(dct['_array'])
+        if y == 'stress':
+            array = torch.stack(dct['_array'])
+        else:
+            array = torch.cat(dct['_array'])
         if array.dtype == torch.int64:  # because of n_neigh
             array = array.to(torch.float)
         try:
@@ -93,10 +97,16 @@ def _run_stat(
         except RuntimeError:
             warnings.warn(f'skip median due to too large tensor size: {y}')
             median = torch.nan
+        if y == 'stress':
+            mean = torch.mean(array, dim=0).tolist()
+            std = torch.std(array, correction=0, dim=0).tolist()
+        else:
+            mean = float(torch.mean(array))
+            std = float(torch.std(array, correction=0))
         dct.update(
             {
-                'mean': float(torch.mean(array)),
-                'std': float(torch.std(array, correction=0)),
+                'mean': mean,
+                'std': std,
                 'median': float(median),
                 'max': float(torch.max(array)),
                 'min': float(torch.min(array)),
@@ -291,6 +301,7 @@ class SevenNetGraphDataset(InMemoryDataset):
 
     def _save_meta(self, graph_list) -> None:
         stats = _run_stat(graph_list)
+        
         stats['elemwise_reference_energies'] = _elemwise_reference_energies(
             stats['_composition'].numpy(), stats[KEY.ENERGY]['_array'].numpy()
         )
@@ -318,7 +329,10 @@ class SevenNetGraphDataset(InMemoryDataset):
             'species': self.species,
             'num_graphs': self.statistics[KEY.ENERGY]['count'],
             'per_atom_energy_mean': self.per_atom_energy_mean,
+            'energy_rms': self.energy_rms,
+            'force_mean': self.force_mean,
             'force_rms': self.force_rms,
+            'stress_mean': self.stress_mean,
             'stress_rms': self.stress_rms,
             'per_atom_energy_std': self.per_atom_energy_std,
             'avg_num_neigh': self.avg_num_neigh,
@@ -345,17 +359,47 @@ class SevenNetGraphDataset(InMemoryDataset):
         return self.statistics['elemwise_reference_energies']
 
     @property
+    def energy_rms(self):
+        mean = self.statistics[KEY.ENERGY]['mean']
+        std = self.statistics[KEY.ENERGY]['std']
+        return float((mean**2 + std**2) ** (0.5))
+
+    @property
+    def force_mean(self):
+        return self.statistics[KEY.FORCE]['mean']
+    
+    @property
     def force_rms(self):
         mean = self.statistics[KEY.FORCE]['mean']
         std = self.statistics[KEY.FORCE]['std']
         return float((mean**2 + std**2) ** (0.5))
     
     @property
-    def stress_rms(self):
-        mean = self.statistics[KEY.STRESS]['mean']
-        std = self.statistics[KEY.STRESS]['std']
-        return float((mean**2 + std**2) ** (0.5))
+    def stress_mean(self):
+        if os.path.exists(self.processed_paths[1]):
+            with open(self.processed_paths[1], 'r') as f:
+                meta = yaml.safe_load(f)
+            if 'stress_mean' in meta:
+                return meta['stress_mean']
+        else:
+            arr = torch.tensor(self.statistics[KEY.STRESS]['_array'])
+            mean = arr[:, :3].mean().item()
+            return float(mean)
 
+    @property
+    def stress_rms(self):
+        if os.path.exists(self.processed_paths[1]):
+            with open(self.processed_paths[1], 'r') as f:
+                meta = yaml.safe_load(f)
+            if 'stress_rms' in meta:
+                return meta['stress_rms']
+        else:
+            arr = torch.tensor(self.statistics[KEY.STRESS]['_array'])
+            x = arr.sum(dim=1) - arr[:, 3:].sum(dim=1) / 3
+            mean = x.mean().item()
+            std = x.std(correction=0).item()
+            return float((mean**2 + std**2) ** (0.5))
+    
     @property
     def per_atom_energy_std(self):
         return self.statistics['per_atom_energy']['std']

@@ -55,8 +55,8 @@ class AtomReduce(nn.Module):
     ):
         super().__init__()
 
-        self.key_input_E = data_key_in
-        self.key_output_E = data_key_out
+        self.key_input = data_key_in
+        self.key_output = data_key_out
         self.constant = constant
         self.reduce = reduce
 
@@ -64,19 +64,18 @@ class AtomReduce(nn.Module):
         self._is_batch_data = True
 
     def forward(self, data: AtomGraphDataType) -> AtomGraphDataType:
-        for _in, _out in zip([self.key_input_E], [self.key_output_E]):
-            if self._is_batch_data:
-                src = data[_in]
-                src_shape = src.shape
-                size = int(data[KEY.BATCH].max()) + 1
-                output = torch.zeros(
-                    (size, *src_shape[1:]), dtype=src.dtype, device=src.device
-                )
-                output.scatter_reduce_(0, data[KEY.BATCH].unsqueeze(-1).expand_as(src), src, reduce='sum')
-                data[_out] = output * self.constant
-            else:
-                data[_out] = torch.sum(data[_in], dim=0) * self.constant
-            
+        if self._is_batch_data:
+            src = data[self.key_input]
+            src_shape = src.shape
+            size = int(data[KEY.BATCH].max()) + 1
+            output = torch.zeros(
+                (size, *src_shape[1:]), dtype=src.dtype, device=src.device
+            )
+            output.scatter_reduce_(0, data[KEY.BATCH].unsqueeze(-1).expand_as(src), src, reduce='sum')
+            data[self.key_output] = output * self.constant
+        else:
+            data[self.key_output] = torch.sum(data[self.key_input], dim=0) * self.constant
+        
         return data
 
 
