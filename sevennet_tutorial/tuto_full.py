@@ -82,7 +82,7 @@ train_cfg.update({
   'scheduler': 'exponentiallr',
   'scheduler_param': {'gamma': 0.99},
   'force_loss_weight': 0.2,
-  'stress_loss_weight': 5e-6,
+  'stress_loss_weight': 1e-6,
 })
 
 # Initialize trainer. It implements common rountines for training.
