@@ -76,13 +76,13 @@ train_cfg = deepcopy(DEFAULT_TRAINING_CONFIG)
 train_cfg.update({
   'device': 'cuda',
   'optimizer': 'adam',
-  'optim_param': {'lr': 0.01},
-  'scheduler': 'linearlr',
-  'scheduler_param': {'start_factor': 1.0, 'total_iters': 50, 'end_factor': 0.0001},
-  # 'scheduler': 'exponentiallr',
-  # 'scheduler_param': {'gamma': 0.99},
+  'optim_param': {'lr': 0.005},
+  # 'scheduler': 'linearlr',
+  # 'scheduler_param': {'start_factor': 1.0, 'total_iters': 50, 'end_factor': 0.0001},
+  'scheduler': 'exponentiallr',
+  'scheduler_param': {'gamma': 0.99},
   'force_loss_weight': 0.2,
-  'stress_loss_weight': 1e-5,
+  'stress_loss_weight': 1e-6,
 })
 
 # Initialize trainer. It implements common rountines for training.
@@ -113,7 +113,7 @@ for metric in train_recorder.metrics:
 from tqdm import tqdm
 
 valid_best = float('inf')
-total_epoch = 50    # you can increase this number for better performance.
+total_epoch = 100    # you can increase this number for better performance.
 pbar = tqdm(range(total_epoch))
 config = model_cfg  # to save config used in this tutorial.
 config.update(train_cfg)
