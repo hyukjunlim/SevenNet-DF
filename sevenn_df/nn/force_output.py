@@ -250,7 +250,7 @@ class DirectEnergyStressOutput(nn.Module):
             [0.0, 0.0,  math.sqrt(2)/math.sqrt(3), 0.0,  0.0],
             [0.0, 0.0, -1/math.sqrt(6), 0.0, 1/math.sqrt(2)],
             [0.0, 1/math.sqrt(2), 0.0, 0.0, 0.0],
-            [0.0, 0.0, 0.0, 0.0, 1/math.sqrt(2)],
+            [0.0, 0.0, 0.0, 1/math.sqrt(2), 0.0],
             [1/math.sqrt(2), 0.0, 0.0, 0.0, 0.0]
         ], dtype=aniso.dtype, device=aniso.device)
         tot_num = torch.sum(data[KEY.NUM_ATOMS])  # ? item?

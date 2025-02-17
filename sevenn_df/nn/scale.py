@@ -54,8 +54,7 @@ class Rescale(nn.Module):
         if 'S' in self.mode:
             x = self.shift_stress
             shift_stress = torch.cat([x, x, x, torch.zeros(3, device=volume.device, dtype=volume.dtype)], dim=-1)
-            data[self.key_output_S] = data[self.key_input_S]
-            # data[self.key_output_S] = (data[self.key_input_S] * self.scale_stress + shift_stress) # / volume
+            data[self.key_output_S] = (data[self.key_input_S] * self.scale_stress + shift_stress) # / volume
             if not self._is_batch_data:
                 data[self.key_output_S] = data[self.key_output_S].squeeze(0)
 
