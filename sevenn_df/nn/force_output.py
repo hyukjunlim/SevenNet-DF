@@ -321,25 +321,33 @@ class DirectEnergyStressOutput(nn.Module):
             # output.scatter_reduce_(0, data[KEY.BATCH].unsqueeze(-1).expand_as(src), src, reduce='sum')
             
             ## 2
-            src = aniso @ A.T + torch.cat([iso, iso, iso, torch.zeros(tot_num, 3, dtype=aniso.dtype, device=aniso.device)], dim=-1)
-            src_shape = src.shape
+            src_andev = aniso @ A.T
+            src_dev = torch.cat([iso, iso, iso, torch.zeros(tot_num, 3, dtype=aniso.dtype, device=aniso.device)], dim=-1)
+            assert src_andev.shape == src_dev.shape
+            
+            src_shape = src_andev.shape
             size = int(data[KEY.BATCH].max()) + 1
-            output = torch.zeros(
-                (size, *src_shape[1:]), dtype=src.dtype, device=src.device
+            output_andev = torch.zeros(
+                (size, *src_shape[1:]), dtype=src_andev.dtype, device=src_andev.device
             )
-            output.scatter_reduce_(0, data[KEY.BATCH].unsqueeze(-1).expand_as(src), src, reduce='sum')
+            output_andev.scatter_reduce_(0, data[KEY.BATCH].unsqueeze(-1).expand_as(src_andev), src_andev, reduce='sum')
+            output_dev = torch.zeros(
+                (size, *src_shape[1:]), dtype=src_dev.dtype, device=src_dev.device
+            )
+            output_dev.scatter_reduce_(0, data[KEY.BATCH].unsqueeze(-1).expand_as(src_dev), src_dev, reduce='sum')
             
             # result
-            data[self.key_stress] = output
+            data[self.key_stress] = (output_andev, output_dev)
         else:
             ## 1
             # output = torch.einsum('ni,nj->nij', v, v).reshape(-1, 9)[:, [0, 4, 8, 1, 5, 2]]
             
             ## 2
-            output = aniso @ A.T + torch.cat([iso, iso, iso, torch.zeros(tot_num, 3, dtype=aniso.dtype, device=aniso.device)], dim=-1)
+            output_andev = aniso @ A.T
+            output_dev = torch.cat([iso, iso, iso, torch.zeros(tot_num, 3, dtype=aniso.dtype, device=aniso.device)], dim=-1)
             
             # result
-            data[self.key_stress] = torch.sum(output, dim=0)
+            data[self.key_stress] = (torch.sum(output_andev, dim=0), torch.sum(output_dev, dim=0))
         
         return data
       

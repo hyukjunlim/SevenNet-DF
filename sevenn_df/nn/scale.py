@@ -24,8 +24,7 @@ class Rescale(nn.Module):
         mode: str = 'EF',
         data_key_cell_volume: str = KEY.CELL_VOLUME,
     ):
-        
-        assert all(isinstance(_, float) for _ in [shift['E'], shift['F'], shift['S'], scale['E'], scale['F'], scale['S']])
+        assert all(isinstance(_, float) for _ in [shift['E'], shift['F'], shift['S'], scale['E'], scale['F']]) and all(isinstance(_, float) for _ in scale['S'])
         super().__init__()
         
         self.scale_energy = nn.Parameter(torch.FloatTensor([scale['E']]), requires_grad=train_shift_scale)
@@ -34,7 +33,8 @@ class Rescale(nn.Module):
         self.scale_force = nn.Parameter(torch.FloatTensor([scale['F']]), requires_grad=train_shift_scale)
         self.shift_force = nn.Parameter(torch.FloatTensor([shift['F']]), requires_grad=train_shift_scale)
         
-        self.scale_stress = nn.Parameter(torch.FloatTensor([scale['S']]), requires_grad=train_shift_scale)
+        self.scale_stress_diagonal = nn.Parameter(torch.FloatTensor([scale['S'][0]]), requires_grad=train_shift_scale)
+        self.scale_stress_off_diagonal = nn.Parameter(torch.FloatTensor([scale['S'][1]]), requires_grad=train_shift_scale)
         self.shift_stress = nn.Parameter(torch.FloatTensor([shift['S']]), requires_grad=train_shift_scale)
         
         self.key_input_E, self.key_input_F, self.key_input_S = data_key_in
@@ -52,9 +52,12 @@ class Rescale(nn.Module):
         if 'F' in self.mode:
             data[self.key_output_F] = data[self.key_input_F] * self.scale_force
         if 'S' in self.mode:
+            andev, dev = data[self.key_input_S]
             x = self.shift_stress
+            a = self.scale_stress_diagonal
+            b = self.scale_stress_off_diagonal
             shift_stress = torch.cat([x, x, x, torch.zeros(3, device=volume.device, dtype=volume.dtype)], dim=-1)
-            data[self.key_output_S] = (data[self.key_input_S] * self.scale_stress + shift_stress) # / volume
+            data[self.key_output_S] = (andev * a + dev * b + shift_stress) # / volume
             if not self._is_batch_data:
                 data[self.key_output_S] = data[self.key_output_S].squeeze(0)
 

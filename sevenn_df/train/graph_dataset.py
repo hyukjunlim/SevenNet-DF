@@ -382,7 +382,7 @@ class SevenNetGraphDataset(InMemoryDataset):
             if 'stress_mean' in meta:
                 return meta['stress_mean']
         else:
-            arr = torch.tensor(self.statistics[KEY.STRESS]['_array'])
+            arr = self.statistics[KEY.STRESS]['_array']
             mean = arr[:, :3].mean().item()
             return float(mean)
 
@@ -392,13 +392,17 @@ class SevenNetGraphDataset(InMemoryDataset):
             with open(self.processed_paths[1], 'r') as f:
                 meta = yaml.safe_load(f)
             if 'stress_rms' in meta:
+                print(meta['stress_rms'], flush=True)
                 return meta['stress_rms']
         else:
-            arr = torch.tensor(self.statistics[KEY.STRESS]['_array'])
-            x = arr.sum(dim=1) - arr[:, 3:].sum(dim=1) / 3
-            mean = x.mean().item()
-            std = x.std(correction=0).item()
-            return float((mean**2 + std**2) ** (0.5))
+            arr = self.statistics[KEY.STRESS]['_array']
+            y = arr[:, 3:].sum(dim=1) / 3 # deviatoric stress
+            x = arr[:, :3].sum(dim=1) / 3 - y # andeviatoric stress
+            mean_x = x.mean().item()
+            std_x = x.std(correction=0).item()
+            mean_y = y.mean().item()
+            std_y = y.std(correction=0).item()
+            return [float((mean_x**2 + std_x**2) ** (0.5)), float((mean_y**2 + std_y**2) ** (0.5))]
     
     @property
     def per_atom_energy_std(self):
