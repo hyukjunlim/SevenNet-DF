@@ -82,7 +82,7 @@ train_cfg.update({
   'scheduler': 'exponentiallr',
   'scheduler_param': {'gamma': 0.99},
   'force_loss_weight': 0.2,
-  'stress_loss_weight': 1e-6,
+  'stress_loss_weight': 5e-6,
 })
 
 # Initialize trainer. It implements common rountines for training.
@@ -113,7 +113,7 @@ for metric in train_recorder.metrics:
 from tqdm import tqdm
 
 valid_best = float('inf')
-total_epoch = 100    # you can increase this number for better performance.
+total_epoch = 200    # you can increase this number for better performance.
 pbar = tqdm(range(total_epoch))
 config = model_cfg  # to save config used in this tutorial.
 config.update(train_cfg)

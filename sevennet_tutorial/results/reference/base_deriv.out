@@ -1,0 +1,144 @@
+GPU 1 assigned to the job
+Wed Feb 19 20:58:55 2025       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 550.107.02             Driver Version: 550.107.02     CUDA Version: 12.4     |
+|-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA TITAN Xp                On  |   00000000:3B:00.0 Off |                  N/A |
+| 23%   25C    P8              9W /  250W |       2MiB /  12288MiB |      0%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+|   1  Quadro P6000                   On  |   00000000:D8:00.0 Off |                  Off |
+| 32%   55C    P8             11W /  250W |       2MiB /  24576MiB |      0%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+                                                                                         
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI        PID   Type   Process name                              GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+# graphs: 170
+# atoms (nodes): {'Cl': 5440, 'Li': 32640, 'P': 5440, 'S': 27200, 'total': 70720}
+AtomGraphData(
+  x=[416],
+  edge_index=[2, 8332],
+  pos=[416, 3],
+  node_attr=[416],
+  atomic_numbers=[416],
+  edge_vec=[8332, 3],
+  total_energy=[1],
+  force_of_atoms=[416, 3],
+  stress=[1, 6],
+  cell_lattice_vectors=[3, 3],
+  pbc_shift=[8332, 3],
+  cell_volume=[1],
+  num_atoms=[1],
+  per_atom_energy=[1],
+  data_info={}
+)
+# graphs for training: 161
+# graphs for validation: 9
+{'irreps_manual': False, 'channel': 16, 'lmax': 2, 'lmax_edge': -1, 'lmax_node': -1, 'is_parity': True, 'radial_basis': {'radial_basis_name': 'bessel'}, 'cutoff_function': {'cutoff_function_name': 'poly_cut'}, 'act_radial': 'silu', 'cutoff': 4.5, 'weight_nn_hidden_neurons': [64, 64], 'num_convolution_layer': 3, 'act_scalar': {'e': 'silu', 'o': 'tanh'}, 'act_gate': {'e': 'silu', 'o': 'tanh'}, 'conv_denominator': 20.45364761352539, 'train_denominator': False, 'train_shift_scale': False, 'use_bias_in_linear': False, 'readout_as_fcn': False, 'readout_fcn_hidden_neurons': [30, 30], 'readout_fcn_activation': 'relu', 'self_connection_type': 'nequip', 'interaction_type': 'nequip', '_normalize_sph': True, 'chemical_species': ['X', 'H', 'He', 'Li', 'Be', 'B', 'C', 'N', 'O', 'F', 'Ne', 'Na', 'Mg', 'Al', 'Si', 'P', 'S', 'Cl', 'Ar', 'K', 'Ca', 'Sc', 'Ti', 'V', 'Cr', 'Mn', 'Fe', 'Co', 'Ni', 'Cu', 'Zn', 'Ga', 'Ge', 'As', 'Se', 'Br', 'Kr', 'Rb', 'Sr', 'Y', 'Zr', 'Nb', 'Mo', 'Tc', 'Ru', 'Rh', 'Pd', 'Ag', 'Cd', 'In', 'Sn', 'Sb', 'Te', 'I', 'Xe', 'Cs', 'Ba', 'La', 'Ce', 'Pr', 'Nd', 'Pm', 'Sm', 'Eu', 'Gd', 'Tb', 'Dy', 'Ho', 'Er', 'Tm', 'Yb', 'Lu', 'Hf', 'Ta', 'W', 'Re', 'Os', 'Ir', 'Pt', 'Au', 'Hg', 'Tl', 'Pb', 'Bi', 'Po', 'At', 'Rn', 'Fr', 'Ra', 'Ac', 'Th', 'Pa', 'U', 'Np', 'Pu', 'Am', 'Cm', 'Bk', 'Cf', 'Es', 'Fm', 'Md', 'No', 'Lr', 'Rf', 'Db', 'Sg', 'Bh', 'Hs', 'Mt', 'Ds', 'Rg', 'Cn', 'Nh', 'Fl', 'Mc', 'Lv', 'Ts', 'Og'], '_chemical_species_by_atomic_number': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118], '_number_of_species': 119, '_type_map': {0: 0, 1: 1, 2: 2, 3: 3, 4: 4, 5: 5, 6: 6, 7: 7, 8: 8, 9: 9, 10: 10, 11: 11, 12: 12, 13: 13, 14: 14, 15: 15, 16: 16, 17: 17, 18: 18, 19: 19, 20: 20, 21: 21, 22: 22, 23: 23, 24: 24, 25: 25, 26: 26, 27: 27, 28: 28, 29: 29, 30: 30, 31: 31, 32: 32, 33: 33, 34: 34, 35: 35, 36: 36, 37: 37, 38: 38, 39: 39, 40: 40, 41: 41, 42: 42, 43: 43, 44: 44, 45: 45, 46: 46, 47: 47, 48: 48, 49: 49, 50: 50, 51: 51, 52: 52, 53: 53, 54: 54, 55: 55, 56: 56, 57: 57, 58: 58, 59: 59, 60: 60, 61: 61, 62: 62, 63: 63, 64: 64, 65: 65, 66: 66, 67: 67, 68: 68, 69: 69, 70: 70, 71: 71, 72: 72, 73: 73, 74: 74, 75: 75, 76: 76, 77: 77, 78: 78, 79: 79, 80: 80, 81: 81, 82: 82, 83: 83, 84: 84, 85: 85, 86: 86, 87: 87, 88: 88, 89: 89, 90: 90, 91: 91, 92: 92, 93: 93, 94: 94, 95: 95, 96: 96, 97: 97, 98: 98, 99: 99, 100: 100, 101: 101, 102: 102, 103: 103, 104: 104, 105: 105, 106: 106, 107: 107, 108: 108, 109: 109, 110: 110, 111: 111, 112: 112, 113: 113, 114: 114, 115: 115, 116: 116, 117: 117, 118: 118}, 'shift': -4.037598133087158, 'scale': 0.6559792162481447}
+AtomGraphSequential(
+  (edge_embedding): EdgeEmbedding(
+    (basis_function): BesselBasis()
+    (cutoff_function): PolynomialCutoff()
+    (spherical): SphericalEncoding(
+      (sph): SphericalHarmonics()
+    )
+  )
+  (onehot_idx_to_onehot): OnehotEmbedding()
+  (onehot_to_feature_x): IrrepsLinear(
+    (linear): Linear(119x0e -> 16x0e | 1904 weights)
+  )
+  (0_self_connection_intro): SelfConnectionIntro(
+    (fc_tensor_product): FullyConnectedTensorProduct(16x0e x 119x0e -> 48x0e+16x1o+16x2e | 91392 paths | 91392 weights)
+  )
+  (0_self_interaction_1): IrrepsLinear(
+    (linear): Linear(16x0e -> 16x0e | 256 weights)
+  )
+  (0_convolution): IrrepsConvolution(
+    (convolution): TensorProduct(16x0e x 1x0e+1x1o+1x2e -> 16x0e+16x1o+16x2e | 48 paths | 48 weights)
+    (weight_nn): FullyConnectedNet[8, 64, 64, 48]
+  )
+  (0_self_interaction_2): IrrepsLinear(
+    (linear): Linear(16x0e+16x1o+16x2e -> 48x0e+16x1o+16x2e | 1280 weights)
+  )
+  (0_self_connection_outro): SelfConnectionOutro()
+  (0_equivariant_gate): EquivariantGate(
+    (gate): Gate (48x0e+16x1o+16x2e -> 16x0e+16x1o+16x2e)
+  )
+  (1_self_connection_intro): SelfConnectionIntro(
+    (fc_tensor_product): FullyConnectedTensorProduct(16x0e+16x1o+16x2e x 119x0e -> 80x0e+16x1o+16x1e+16x2o+16x2e | 213248 paths | 213248 weights)
+  )
+  (1_self_interaction_1): IrrepsLinear(
+    (linear): Linear(16x0e+16x1o+16x2e -> 16x0e+16x1o+16x2e | 768 weights)
+  )
+  (1_convolution): IrrepsConvolution(
+    (convolution): TensorProduct(16x0e+16x1o+16x2e x 1x0e+1x1o+1x2e -> 48x0e+64x1o+32x1e+32x2o+64x2e | 240 paths | 240 weights)
+    (weight_nn): FullyConnectedNet[8, 64, 64, 240]
+  )
+  (1_self_interaction_2): IrrepsLinear(
+    (linear): Linear(48x0e+64x1o+32x1e+32x2o+64x2e -> 80x0e+16x1o+16x1e+16x2o+16x2e | 6912 weights)
+  )
+  (1_self_connection_outro): SelfConnectionOutro()
+  (1_equivariant_gate): EquivariantGate(
+    (gate): Gate (80x0e+16x1o+16x1e+16x2o+16x2e -> 16x0e+16x1o+16x1e+16x2o+16x2e)
+  )
+  (2_self_connection_intro): SelfConnectionIntro(
+    (fc_tensor_product): FullyConnectedTensorProduct(16x0e+16x1o+16x1e+16x2o+16x2e x 119x0e -> 16x0e | 30464 paths | 30464 weights)
+  )
+  (2_self_interaction_1): IrrepsLinear(
+    (linear): Linear(16x0e+16x1o+16x1e+16x2o+16x2e -> 16x0e+16x1o+16x1e+16x2o+16x2e | 1280 weights)
+  )
+  (2_convolution): IrrepsConvolution(
+    (convolution): TensorProduct(16x0e+16x1o+16x1e+16x2o+16x2e x 1x0e+1x1o+1x2e -> 48x0e | 48 paths | 48 weights)
+    (weight_nn): FullyConnectedNet[8, 64, 64, 48]
+  )
+  (2_self_interaction_2): IrrepsLinear(
+    (linear): Linear(48x0e -> 16x0e | 768 weights)
+  )
+  (2_self_connection_outro): SelfConnectionOutro()
+  (2_equivariant_gate): EquivariantGate(
+    (gate): Gate (16x0e -> 16x0e)
+  )
+  (reduce_input_to_hidden): IrrepsLinear(
+    (linear): Linear(16x0e -> 8x0e | 128 weights)
+  )
+  (reduce_hidden_to_energy): IrrepsLinear(
+    (linear): Linear(8x0e -> 1x0e | 8 weights)
+  )
+  (rescale_atomic_energy): Rescale()
+  (reduce_total_enegy): AtomReduce()
+  (force_output): ForceStressOutputFromEdge()
+)
+# model weights: 383744
+[(Energy, 1.0), (Force, 0.2), (Stress, 5e-06)]
+Adam (
+Parameter Group 0
+    amsgrad: False
+    betas: (0.9, 0.999)
+    capturable: False
+    differentiable: False
+    eps: 1e-08
+    foreach: None
+    fused: None
+    initial_lr: 0.005
+    lr: 0.005
+    maximize: False
+    weight_decay: 0
+)
+<torch.optim.lr_scheduler.LinearLR object at 0x14ed499fcd00>
+Energy_RMSE (eV/atom): nan
+Force_RMSE (eV/Å): nan
+Stress_RMSE (kbar): nan
+TotalLoss: nan
+(DFT) potential_energy (eV/atom): -4.166412019230769
+Relax with from-scratch potential...
+(From scratch) potential_energy (eV/atom): -4.160313532902644

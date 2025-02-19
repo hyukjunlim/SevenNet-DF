@@ -91,7 +91,7 @@ import ase.io
 from tqdm import tqdm
 import time
 
-for mode in ['df', '0']:
+for mode in ['0', 'df']:
   if mode == 'df':
     from sevenn_df.sevennet_calculator import SevenNetCalculator
     sevennet_calc = SevenNetCalculator(os.path.join(working_dir, 'checkpoint_best.pth'))
