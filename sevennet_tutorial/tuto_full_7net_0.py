@@ -1,13 +1,13 @@
 import sys
 sys.path.append('../../SevenNet')
-import sevenn_df
+import sevenn
 import os.path
 
 data_path = './data'
 working_dir = os.getcwd() # save current path
 assert os.path.exists(data_path) and os.path.exists(os.path.join(data_path, 'train'))
 
-from sevenn_df.train.graph_dataset import SevenNetGraphDataset
+from sevenn.train.graph_dataset import SevenNetGraphDataset
 
 dataset_prefix = os.path.join(data_path, 'train')
 xyz_files = ['1200K.extxyz', '600K.extxyz']
@@ -40,9 +40,9 @@ valid_loader = DataLoader(valid_dataset, batch_size=8)
 
 from copy import deepcopy
 
-from sevenn_df._const import DEFAULT_E3_EQUIVARIANT_MODEL_CONFIG
-from sevenn_df.model_build import build_E3_equivariant_model
-import sevenn_df.util as util
+from sevenn._const import DEFAULT_E3_EQUIVARIANT_MODEL_CONFIG
+from sevenn.model_build import build_E3_equivariant_model
+import sevenn.util as util
 
 # copy default model configuration.
 model_cfg = deepcopy(DEFAULT_E3_EQUIVARIANT_MODEL_CONFIG)
@@ -55,8 +55,9 @@ model_cfg.update({'channel': 16, 'lmax': 2})
 model_cfg.update(util.chemical_species_preprocess([], universal=True))
 
 # tell model about statistics of dataset. kind of data standardization
-train_shift = {'E': dataset.per_atom_energy_mean, 'F': dataset.force_mean, 'S': dataset.stress_mean}
-train_scale = {'E': dataset.energy_rms, 'F': dataset.force_rms, 'S': dataset.stress_rms}
+train_shift = dataset.per_atom_energy_mean
+train_scale = dataset.force_rms
+# train_scale = {'force': dataset.force_rms, 'stress': dataset.stress_rms}
 train_conv_denominator = dataset.avg_num_neigh
 model_cfg.update({'shift': train_shift, 'scale': train_scale, 'conv_denominator': train_conv_denominator})
 print(model_cfg)
@@ -66,8 +67,8 @@ num_weights = sum(p.numel() for p in model.parameters() if p.requires_grad)
 print(model) # model info
 print(f'# model weights: {num_weights}')
 
-from sevenn_df._const import DEFAULT_TRAINING_CONFIG
-from sevenn_df.train.trainer import Trainer
+from sevenn._const import DEFAULT_TRAINING_CONFIG
+from sevenn.train.trainer import Trainer
 
 # copy default training configuration
 train_cfg = deepcopy(DEFAULT_TRAINING_CONFIG)
@@ -91,7 +92,7 @@ print(trainer.loss_functions)  # We have energy, force, stress loss function by 
 print(trainer.optimizer)
 print(trainer.scheduler)
 
-from sevenn_df.error_recorder import ErrorRecorder
+from sevenn.error_recorder import ErrorRecorder
 
 train_cfg.update({
   # List of tuple [Quantity name, metric name]
@@ -139,7 +140,7 @@ for epoch in pbar:
 import torch
 import ase.io
 
-from sevenn_df.sevennet_calculator import SevenNetCalculator
+from sevenn.sevennet_calculator import SevenNetCalculator
 
 # Let's test our model by predicting DFT MD trajectory
 # Instead of using other functions in SevenNet, we will use ASE calculator as an interface of our model
@@ -218,7 +219,7 @@ def density_colored_scatter_plot(dft_energy, nnp_energy, dft_force, nnp_force, d
         ax.set_aspect('equal')
 
     plt.tight_layout()
-    plt.savefig('./results/parity_plot_base_full_pert.01.png')
+    plt.savefig('./results/parity_plot_base_deriv_full.png')
 
 density_colored_scatter_plot(dft_energy, mlp_energy, dft_forces, mlp_forces, dft_stress, mlp_stress)
 
@@ -278,7 +279,7 @@ def get_eos_and_volume(eos_list):
   
 # calculate EOS curve
 from ase.io import read, write
-from sevenn_df.sevennet_calculator import SevenNetCalculator
+from sevenn.sevennet_calculator import SevenNetCalculator
 
 # get relaxed structure
 os.makedirs('eos', exist_ok=True)
@@ -313,4 +314,4 @@ plt.ylabel("Relative energy (eV)")
 
 plt.legend()
 plt.tight_layout()
-plt.savefig('./results/eos_curve_base_full_pert.01.png')
+plt.savefig('./results/eos_curve_base_deriv_full.png')

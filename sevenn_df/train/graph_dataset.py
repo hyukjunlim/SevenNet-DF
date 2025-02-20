@@ -392,7 +392,6 @@ class SevenNetGraphDataset(InMemoryDataset):
             with open(self.processed_paths[1], 'r') as f:
                 meta = yaml.safe_load(f)
             if 'stress_rms' in meta:
-                print(meta['stress_rms'], flush=True)
                 return meta['stress_rms']
         else:
             arr = self.statistics[KEY.STRESS]['_array']
