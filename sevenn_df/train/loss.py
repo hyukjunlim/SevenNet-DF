@@ -409,18 +409,18 @@ def get_loss_functions_from_config(config: Dict[str, Any]):
     criterion = loss(**loss_param)
     
     consistency_weight = 0.5
-    consistency2_weight = 0.1
-    noiseconsistency2_weight = 0.05
+    consistency2_weight = 0.25
+    # noiseconsistency2_weight = 0.05
     loss_functions.append((PerAtomEnergyLoss(), 1.0))
     loss_functions.append((ForceLoss(), config[KEY.FORCE_WEIGHT]))
     loss_functions.append((ConsistencyForceLoss(), config[KEY.FORCE_WEIGHT] * consistency_weight))
     loss_functions.append((ConsistencyForceLoss2(), config[KEY.FORCE_WEIGHT] * consistency2_weight))
-    loss_functions.append((NoiseConsistencyForceLoss2(), config[KEY.FORCE_WEIGHT] * noiseconsistency2_weight))
+    # loss_functions.append((NoiseConsistencyForceLoss2(), config[KEY.FORCE_WEIGHT] * noiseconsistency2_weight))
     if config[KEY.IS_TRAIN_STRESS]:
         loss_functions.append((StressLoss(), config[KEY.STRESS_WEIGHT]))
         loss_functions.append((ConsistencyStressLoss(), config[KEY.STRESS_WEIGHT] * consistency_weight))
         loss_functions.append((ConsistencyStressLoss2(), config[KEY.STRESS_WEIGHT] * consistency2_weight))
-        loss_functions.append((NoiseConsistencyStressLoss2(), config[KEY.STRESS_WEIGHT] * noiseconsistency2_weight))
+        # loss_functions.append((NoiseConsistencyStressLoss2(), config[KEY.STRESS_WEIGHT] * noiseconsistency2_weight))
         
     for loss_function, _ in loss_functions:
         if loss_function.criterion is None:

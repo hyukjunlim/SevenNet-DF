@@ -76,6 +76,7 @@ class SevenNetAtomsDataset(torch.utils.data.Dataset):
 
     def __getitem__(self, index):
         atoms = self._atoms_list[index]
+        # 
         if self.atoms_trasform is not None:
             atoms = self.atoms_trasform(atoms)
 

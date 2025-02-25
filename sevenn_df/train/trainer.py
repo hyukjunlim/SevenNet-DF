@@ -159,16 +159,17 @@ class Trainer:
                 self.optimizer.zero_grad()
             batch = batch.to(self.device, non_blocking=True)
             output = self.model(batch)
-            # noised batch
-            perturbation_strength = 0.01
-            batch.pos += torch.randn_like(batch.pos).to(self.device, non_blocking=True) * perturbation_strength
-            output_noise = self.model(batch)
+            # # noised batch
+            # perturbation_strength = 0.01
+            # batch.pos += torch.randn_like(batch.pos).to(self.device, non_blocking=True) * perturbation_strength
+            # output_noise = self.model(batch)
             if error_recorder is not None:
                 error_recorder.update(output)
             if is_train:
                 total_loss = torch.tensor([0.0], device=self.device)
                 for loss_def, w in self.loss_functions:
-                    x = output_noise if "Noise" in loss_def.name else output
+                    x = output
+                    # x = output_noise if "Noise" in loss_def.name else output
                     total_loss += loss_def.get_loss(x, self.model) * w
                 total_loss.backward()
                 self.optimizer.step()

@@ -1,5 +1,5 @@
-GPU 1 assigned to the job
-Thu Feb 20 12:00:53 2025       
+GPU 0 assigned to the job
+Fri Feb 21 00:11:46 2025       
 +-----------------------------------------------------------------------------------------+
 | NVIDIA-SMI 550.107.02             Driver Version: 550.107.02     CUDA Version: 12.4     |
 |-----------------------------------------+------------------------+----------------------+
@@ -8,27 +8,27 @@ Thu Feb 20 12:00:53 2025
 |                                         |                        |               MIG M. |
 |=========================================+========================+======================|
 |   0  NVIDIA RTX A5000               On  |   00000000:3D:00.0 Off |                  Off |
-| 30%   37C    P2             73W /  230W |    1477MiB /  24564MiB |     13%      Default |
+| 30%   29C    P8             18W /  230W |       2MiB /  24564MiB |      0%      Default |
 |                                         |                        |                  N/A |
 +-----------------------------------------+------------------------+----------------------+
 |   1  NVIDIA RTX A5000               On  |   00000000:3E:00.0 Off |                  Off |
-| 30%   33C    P8             15W /  230W |       4MiB /  24564MiB |      0%      Default |
+| 30%   28C    P8             15W /  230W |       2MiB /  24564MiB |      0%      Default |
 |                                         |                        |                  N/A |
 +-----------------------------------------+------------------------+----------------------+
 |   2  NVIDIA GeForce RTX 3090        On  |   00000000:41:00.0 Off |                  N/A |
-| 30%   40C    P2            114W /  350W |    1537MiB /  24576MiB |     16%      Default |
+| 30%   39C    P2            115W /  350W |    1539MiB /  24576MiB |     17%      Default |
 |                                         |                        |                  N/A |
 +-----------------------------------------+------------------------+----------------------+
 |   3  NVIDIA GeForce RTX 3090        On  |   00000000:B2:00.0 Off |                  N/A |
-| 30%   38C    P2            121W /  350W |    1537MiB /  24576MiB |     17%      Default |
+| 30%   37C    P2            121W /  350W |    1541MiB /  24576MiB |     16%      Default |
 |                                         |                        |                  N/A |
 +-----------------------------------------+------------------------+----------------------+
 |   4  NVIDIA RTX A5000               On  |   00000000:B4:00.0 Off |                  Off |
-| 40%   70C    P2            220W /  230W |    5863MiB /  24564MiB |     87%      Default |
+| 30%   29C    P8             14W /  230W |       2MiB /  24564MiB |      0%      Default |
 |                                         |                        |                  N/A |
 +-----------------------------------------+------------------------+----------------------+
 |   5  NVIDIA RTX A5000               On  |   00000000:B5:00.0 Off |                  Off |
-| 30%   45C    P2            104W /  230W |    5379MiB /  24564MiB |     33%      Default |
+| 30%   51C    P2            112W /  230W |    5379MiB /  24564MiB |     44%      Default |
 |                                         |                        |                  N/A |
 +-----------------------------------------+------------------------+----------------------+
                                                                                          
@@ -37,10 +37,8 @@ Thu Feb 20 12:00:53 2025
 |  GPU   GI   CI        PID   Type   Process name                              GPU Memory |
 |        ID   ID                                                               Usage      |
 |=========================================================================================|
-|    0   N/A  N/A     13741      C   ...9/.conda/envs/dos_adapt2/bin/python       1470MiB |
-|    2   N/A  N/A     23331      C   ...9/.conda/envs/dos_adapt2/bin/python       1530MiB |
-|    3   N/A  N/A     23407      C   ...conda/envs/dos_scale_fix/bin/python       1530MiB |
-|    4   N/A  N/A     15488      C   lmp_7fused                                   5856MiB |
+|    2   N/A  N/A     23331      C   ...9/.conda/envs/dos_adapt2/bin/python       1532MiB |
+|    3   N/A  N/A     23407      C   ...conda/envs/dos_scale_fix/bin/python       1534MiB |
 |    5   N/A  N/A     12050      C   ...onda3/envs/simplennv2/bin/python3.9       5372MiB |
 +-----------------------------------------------------------------------------------------+
 # graphs: 2000
@@ -156,8 +154,11 @@ Parameter Group 0
     maximize: False
     weight_decay: 0
 )
-<torch.optim.lr_scheduler.ExponentialLR object at 0x15055e8f2cb0>
+<torch.optim.lr_scheduler.ExponentialLR object at 0x15443ae5fc70>
 Energy_RMSE (eV/atom): nan
 Force_RMSE (eV/Å): nan
 Stress_RMSE (kbar): nan
 TotalLoss: nan
+(DFT) potential_energy (eV/atom): -4.166412019230769
+Relax with from-scratch potential...
+(From scratch) potential_energy (eV/atom): -4.164959834172175

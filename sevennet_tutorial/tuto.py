@@ -13,6 +13,9 @@ dataset_prefix = os.path.join(data_path, 'train')
 xyz_files = ['1200K.extxyz', '600K.extxyz']
 dataset_files = [os.path.join(dataset_prefix, xyz) for xyz in xyz_files]
 
+
+# CONCAT_DATASET
+
 # Preprocess(build graphs) data before training. It will automatically saves processed graph to {root}/sevenn_data/train.pt, metadata + statistics as train.yaml
 cutoff = 4.5  # cutoff radius for graph construction. You can change this value.
 dataset = SevenNetGraphDataset(cutoff=cutoff, root=working_dir, files=dataset_files, processed_name='train.pt')

@@ -218,7 +218,7 @@ def density_colored_scatter_plot(dft_energy, nnp_energy, dft_force, nnp_force, d
         ax.set_aspect('equal')
 
     plt.tight_layout()
-    plt.savefig('./results/parity_plot_base_full_pert.01.png')
+    plt.savefig('./results/parity_plot_base_full5.png')
 
 density_colored_scatter_plot(dft_energy, mlp_energy, dft_forces, mlp_forces, dft_stress, mlp_stress)
 
@@ -313,4 +313,4 @@ plt.ylabel("Relative energy (eV)")
 
 plt.legend()
 plt.tight_layout()
-plt.savefig('./results/eos_curve_base_full_pert.01.png')
+plt.savefig('./results/eos_curve_base_full5.png')
