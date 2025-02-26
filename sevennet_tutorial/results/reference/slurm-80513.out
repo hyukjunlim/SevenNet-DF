@@ -165,3 +165,6 @@ Energy_RMSE (eV/atom): nan
 Force_RMSE (eV/Å): nan
 Stress_RMSE (kbar): nan
 TotalLoss: nan
+(DFT) potential_energy (eV/atom): -4.166412019230769
+Relax with from-scratch potential...
+(From scratch) potential_energy (eV/atom): -4.166511829082783

@@ -18,7 +18,7 @@ mode = 'df'
 data_path = './data'
 DFT_md_xyz = os.path.join(data_path, 'evaluation/test_md.extxyz')
 traj = ase.io.read(DFT_md_xyz, index=':')
-atoms = traj[-1]
+atoms = traj[0]
 
 # size = 3
 # # Set up a crystal
