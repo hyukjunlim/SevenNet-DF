@@ -256,7 +256,7 @@ class DirectEnergyStressOutput(nn.Module):
         tot_num = torch.sum(data[KEY.NUM_ATOMS])  # ? item?
         
         if self._is_batch_data:
-            # Derivating method
+            ### Derivating method
             rij = data[self.key_edge]
             energy = [(data[self.key_energy]).sum()]
             edge_idx = data[self.key_edge_idx]
@@ -310,17 +310,6 @@ class DirectEnergyStressOutput(nn.Module):
                     
             ### Direct method
             size = volume.shape[0]
-            
-            ## 1
-            # src = torch.einsum('bi,bj->bij', v, v).reshape(-1, 9)[:, [0, 4, 8, 1, 5, 2]]
-            # src_shape = src.shape
-            # size = int(data[KEY.BATCH].max()) + 1
-            # output = torch.zeros(
-            #     (size, *src_shape[1:]), dtype=src.dtype, device=src.device
-            # )
-            # output.scatter_reduce_(0, data[KEY.BATCH].unsqueeze(-1).expand_as(src), src, reduce='sum')
-            
-            ## 2
             src_andev = aniso @ A.T
             src_dev = torch.cat([iso, iso, iso, torch.zeros(tot_num, 3, dtype=aniso.dtype, device=aniso.device)], dim=-1)
             assert src_andev.shape == src_dev.shape
@@ -336,57 +325,18 @@ class DirectEnergyStressOutput(nn.Module):
             )
             output_dev.scatter_reduce_(0, data[KEY.BATCH].unsqueeze(-1).expand_as(src_dev), src_dev, reduce='sum')
             
-            # result
+            # output
             data[self.key_stress] = (output_andev, output_dev)
         else:
-            ## 1
-            # output = torch.einsum('ni,nj->nij', v, v).reshape(-1, 9)[:, [0, 4, 8, 1, 5, 2]]
-            
-            ## 2
+            ### Direct method (only)
             output_andev = aniso @ A.T
             output_dev = torch.cat([iso, iso, iso, torch.zeros(tot_num, 3, dtype=aniso.dtype, device=aniso.device)], dim=-1)
             
-            # result
+            # output
             data[self.key_stress] = (torch.sum(output_andev, dim=0), torch.sum(output_dev, dim=0))
         
         return data
       
-# @compile_mode('script')
-# class DirectEnergyStressOutput(nn.Module):
-#     """
-#     Process energy and stress.
-#     Used in serial torchscipt models
-#     """
-#     def __init__(
-#         self,
-#         data_key_energy: str = KEY.PRED_ENERGY,
-#         data_key_stress: str = KEY.PRED_STRESS,
-#         data_key_cell_volume: str = KEY.CELL_VOLUME,
-#     ):
-
-#         super().__init__()
-#         self.key_energy = data_key_energy
-#         self.key_stress = data_key_stress
-#         self.key_cell_volume = data_key_cell_volume
-#         self._is_batch_data = True
-
-#     def forward(self, data: AtomGraphDataType) -> AtomGraphDataType:
-#         volume = data[self.key_cell_volume]
-        
-#         data[self.key_energy] = data[self.key_energy].squeeze(-1)
-#         v = data[self.key_stress]
-        
-#         if self._is_batch_data:
-#             size = volume.shape[0]
-#             voigt = torch.einsum('bi,bj->bij', v, v).reshape(size, 9)[:, [0, 4, 8, 1, 5, 2]]
-#             data[self.key_stress] = voigt / volume.view(-1, 1)
-#         else:
-#             voigt = torch.einsum('i,j->ij', v, v).reshape(9)[[0, 4, 8, 1, 5, 2]]
-#             data[self.key_stress] = voigt / volume
-        
-#         return data
-
-
 @compile_mode('script')
 class SplitEFS(nn.Module):
     """

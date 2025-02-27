@@ -76,13 +76,13 @@ train_cfg = deepcopy(DEFAULT_TRAINING_CONFIG)
 train_cfg.update({
   'device': 'cuda',
   'optimizer': 'adam',
-  'optim_param': {'lr': 0.005},
+  'optim_param': {'lr': 0.01},
   # 'scheduler': 'linearlr',
   # 'scheduler_param': {'start_factor': 1.0, 'total_iters': 50, 'end_factor': 0.0001},
   'scheduler': 'exponentiallr',
-  'scheduler_param': {'gamma': 0.99},
+  'scheduler_param': {'gamma': 0.985},
   'force_loss_weight': 0.2,
-  'stress_loss_weight': 5e-6,
+  'stress_loss_weight': 1e-5,
 })
 
 # Initialize trainer. It implements common rountines for training.
