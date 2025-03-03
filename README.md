@@ -1,6 +1,4 @@
 
-<img src="SevenNet_logo.png" alt="Alt text" height="180">
-
 # SevenNet_dFS
 
 **SevenNet_dFS** is an extended version of [**SevenNet**](https://github.com/MDIL-SNU/SevenNet), a machine-learning-based force field model tailored for molecular dynamics (MD) simulations.
@@ -18,20 +16,26 @@
 
 ## Performance
 
-| Metric                      | Improvement         |
-|-----------------------------|---------------------|
-| Training Speed         | ✅ 1.59x Slower      |
-| Inference Speed         | ✅ 4.91x Faster      |
-| MD Simulation Speed         | ✅ 255.28x Faster      |
-| Prediction Accuracy         | ✅ Enhanced         |
-| Inference Computational Cost| ✅ Significantly Reduced |
+| Metric                      | Improvement               |
+|-----------------------------|---------------------------|
+| Training Speed              | ⚠️ 1.59× slower           |
+| Inference Speed             | ✅ 4.91× faster           |
+| MD Simulation Speed         | ✅ 255.28× faster         |
+| Prediction Accuracy         | ✅ Enhanced               |
+| Inference Computational Cost| ✅ Significantly reduced  |
 
-We prepared our tutorial example of Li-argyrodite (Li6PS5Cl) data, which consists of total 2000 data with each data has 416 nodes (Li192P32S160Cl32) and 8,332 edges (in case of 4.5 Å cutoff).
+Our example dataset for Li-argyrodite (Li<sub>6</sub>PS<sub>5</sub>Cl) consists of 2000 configurations, each containing 416 nodes (Li<sub>192</sub>P<sub>32</sub>S<sub>160</sub>Cl<sub>32</sub>) and 8,332 edges (with a cutoff radius of 4.5 Å).
 
-We've achieved strong performance of validation RMSE: 1 meV/atom (energy), 0.074 eV/Ang. (force), and 0.641 kbar (stress).
+The model achieved excellent validation performance:
 
-<img src="sevennet_tutorial/results/reference/eos_curve_base_full5.png" alt="Alt text" height="180">
-<img src="sevennet_tutorial/results/reference/parity_plot_base_full5.png" alt="Alt text" height="180">
+- **Energy RMSE:** 1 meV/atom
+- **Force RMSE:** 0.074 eV/\AA
+- **Stress RMSE:** 0.641 kbar
+
+<div style="display: flex; align-items: center; justify-content: start; gap: 10px;">
+  <img src="sevennet_tutorial/results/reference/eos_curve_base_full5.png" alt="Equation of State Curve" height="180">
+  <img src="sevennet_tutorial/results/reference/parity_plot_base_full5.png" alt="Parity Plot" height="180">
+</div>
 
 ## Quick Start
 
