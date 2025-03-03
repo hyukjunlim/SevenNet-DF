@@ -29,7 +29,7 @@ Our example dataset for Li-argyrodite (Li<sub>6</sub>PS<sub>5</sub>Cl) consists 
 The model achieved excellent validation performance:
 
 - **Energy RMSE:** 1 meV/atom
-- **Force RMSE:** 0.074 eV/\AA
+- **Force RMSE:** 0.074 eV/Å
 - **Stress RMSE:** 0.641 kbar
 
 <div style="display: flex; align-items: center; justify-content: start; gap: 10px;">
