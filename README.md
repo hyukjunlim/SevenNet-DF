@@ -18,13 +18,13 @@
 
 | Metric                      | Improvement               |
 |-----------------------------|---------------------------|
-| Training Speed              | ⚠️ 1.59× slower           |
-| Inference Speed             | ✅ 4.91× faster           |
-| MD Simulation Speed         | ✅ 255.28× faster         |
+| Training Speed              | ⚠️ 1.59x slower           |
+| Inference Speed             | ✅ 4.91x faster           |
+| MD Simulation Speed         | ✅ 255.28x faster         |
 | Prediction Accuracy         | ✅ Enhanced               |
 | Inference Computational Cost| ✅ Significantly reduced  |
 
-Our example dataset for Li-argyrodite (Li<sub>6</sub>PS<sub>5</sub>Cl) consists of 2000 configurations, each containing 416 nodes (Li<sub>192</sub>P<sub>32</sub>S<sub>160</sub>Cl<sub>32</sub>) and 8,332 edges (with a cutoff radius of 4.5 Å).
+Our example dataset for Li-argyrodite (Li<sub>6</sub>PS<sub>5</sub>Cl) consists of 2,000 configurations, each containing 416 nodes (Li<sub>192</sub>P<sub>32</sub>S<sub>160</sub>Cl<sub>32</sub>) and 8,332 edges (with a cutoff radius of 4.5 Å).
 
 The model achieved excellent validation performance:
 
@@ -47,14 +47,14 @@ cd SevenNet_dFS
 # Install dependencies
 pip install sevenn
 
-# Run inference example
+# Run tutorial example
 cd sevennet_tutorial
 python tuto.py
 ```
 
 ## Citation<a name="citation"></a>
 
-If you use this code, please cite our paper:
+If you use this code, please cite the SevenNet paper:
 ```bibtex
 @article{park_scalable_2024,
 	title = {Scalable Parallel Algorithm for Graph Neural Network Interatomic Potentials in Molecular Dynamics Simulations},
