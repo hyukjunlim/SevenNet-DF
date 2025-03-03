@@ -12,6 +12,4 @@ sevennet_tutorial/*
 !sevennet_tutorial/*.out
 
 # every folders in sevennet_tutorial, except results folder
-sevennet_tutorial/*/
-!sevennet_tutorial/results/
-!sevennet_tutorial/experiment/
+sevennet_tutorial/train_data_dont_delete
