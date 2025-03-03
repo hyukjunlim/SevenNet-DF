@@ -28,9 +28,9 @@ Our example dataset for Li-argyrodite (Li<sub>6</sub>PS<sub>5</sub>Cl) consists 
 
 The model achieved excellent performance on test MD simulation:
 
-- **Energy RMSE:** 0.5131 meV/atom
-- **Force RMSE:** 0.0396 eV/Å
-- **Stress RMSE:** 0.2903 kbar
+- **Energy MAE:** 0.5131 meV/atom
+- **Force MAE:** 0.0396 eV/Å
+- **Stress MAE:** 0.2903 kbar
 
 <div style="display: flex; align-items: center; justify-content: start; gap: 10px;">
   <img src="sevennet_tutorial/results/eos_curve_base_full5.png" alt="Equation of State Curve" height="180">
