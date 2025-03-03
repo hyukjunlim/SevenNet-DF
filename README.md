@@ -26,11 +26,11 @@
 
 Our example dataset for Li-argyrodite (Li<sub>6</sub>PS<sub>5</sub>Cl) consists of 2,000 configurations, each containing 416 nodes (Li<sub>192</sub>P<sub>32</sub>S<sub>160</sub>Cl<sub>32</sub>) and 8,332 edges (with a cutoff radius of 4.5 Å).
 
-The model achieved excellent validation performance:
+The model achieved excellent performance on test MD simulation:
 
-- **Energy RMSE:** 1 meV/atom
-- **Force RMSE:** 0.074 eV/Å
-- **Stress RMSE:** 0.641 kbar
+- **Energy RMSE:** 0.5131 meV/atom
+- **Force RMSE:** 0.0396 eV/Å
+- **Stress RMSE:** 0.2903 kbar
 
 <div style="display: flex; align-items: center; justify-content: start; gap: 10px;">
   <img src="sevennet_tutorial/results/eos_curve_base_full5.png" alt="Equation of State Curve" height="180">
