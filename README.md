@@ -5,7 +5,7 @@
 
 **SevenNet_dFS** is an extended and optimized version of [**SevenNet**](https://github.com/MDIL-SNU/SevenNet), a machine-learning-based force field model tailored for molecular dynamics (MD) simulations.
 
-## Key Improvements
+## Key Differences
 
 ```diff
 + Direct force and stress prediction output
