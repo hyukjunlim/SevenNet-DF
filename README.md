@@ -11,6 +11,7 @@
 + Direct force and stress prediction output
 + Integrated derivative values during training for higher accuracy
 + Up to 250x faster MD simulation speed
+- non-conservative MD simulation
 ```
 
 ## Model Overview
@@ -58,10 +59,11 @@ git clone https://github.com/your-repo/SevenNet_dFS.git
 cd SevenNet_dFS
 
 # Install dependencies
-pip install -r requirements.txt
+pip install sevenn
 
 # Run inference example
-python inference.py --input example_input.xyz
+cd sevennet_tutorial
+python tuto.py
 ```
 
 ## Citation<a name="citation"></a>
