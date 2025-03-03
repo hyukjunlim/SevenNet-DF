@@ -16,13 +16,13 @@
 
 ## Performance
 
-| Metric                      | Improvement               |
-|-----------------------------|---------------------------|
-| Training Speed              | ⚠️ 1.59x slower           |
-| Inference Speed             | ✅ 4.91x faster           |
-| MD Simulation Speed         | ✅ 255.28x faster         |
-| Prediction Accuracy         | ✅ Enhanced               |
-| Inference Computational Cost| ✅ Significantly reduced  |
+| Metric                      | Improvement                  |
+|-----------------------------|------------------------------|
+| Training Speed                 | ⚠️ 1.59x slower           |
+| Inference Speed                | ✅ 4.91x faster           |
+| MD Simulation Speed            | ✅ 255.28x faster         |
+| Prediction Accuracy            | ✅ Excellent              |
+| MD/Inference Computational Cost| ✅ Significantly reduced  |
 
 Our example dataset for Li-argyrodite (Li<sub>6</sub>PS<sub>5</sub>Cl) consists of 2,000 configurations, each containing 416 nodes (Li<sub>192</sub>P<sub>32</sub>S<sub>160</sub>Cl<sub>32</sub>) and 8,332 edges (with a cutoff radius of 4.5 Å).
 
