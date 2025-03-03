@@ -33,8 +33,8 @@ The model achieved excellent validation performance:
 - **Stress RMSE:** 0.641 kbar
 
 <div style="display: flex; align-items: center; justify-content: start; gap: 10px;">
-  <img src="sevennet_tutorial/results/reference/eos_curve_base_full5.png" alt="Equation of State Curve" height="180">
-  <img src="sevennet_tutorial/results/reference/parity_plot_base_full5.png" alt="Parity Plot" height="180">
+  <img src="sevennet_tutorial/results/eos_curve_base_full5.png" alt="Equation of State Curve" height="180">
+  <img src="sevennet_tutorial/results/parity_plot_base_full5.png" alt="Parity Plot" height="180">
 </div>
 
 ## Quick Start
