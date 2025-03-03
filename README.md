@@ -3,7 +3,7 @@
 
 # SevenNet_dFS
 
-**SevenNet_dFS** is an extended and optimized version of [**SevenNet**](https://github.com/MDIL-SNU/SevenNet), a machine-learning-based force field model tailored for molecular dynamics (MD) simulations.
+**SevenNet_dFS** is an extended version of [**SevenNet**](https://github.com/MDIL-SNU/SevenNet), a machine-learning-based force field model tailored for molecular dynamics (MD) simulations.
 
 ## Key Differences
 
@@ -26,11 +26,18 @@
 | Prediction Accuracy         | ✅ Enhanced         |
 | Inference Computational Cost| ✅ Significantly Reduced |
 
+We prepared our tutorial example of Li-argyrodite (Li6PS5Cl) data, which consists of total 2000 data with each data has 416 nodes (Li192P32S160Cl32) and 8,332 edges (in case of 4.5 Å cutoff).
+
+We've achieved strong performance of validation RMSE: 1 meV/atom (energy), 0.074 eV/Ang. (force), and 0.641 kbar (stress).
+
+<img src="sevennet_tutorial/results/reference/eos_curve_base_full5.png" alt="Alt text" height="180">
+<img src="sevennet_tutorial/results/reference/parity_plot_base_full5.png" alt="Alt text" height="180">
+
 ## Quick Start
 
 ```bash
 # Clone Repository
-git clone https://github.com/your-repo/SevenNet_dFS.git
+git clone https://github.com/hyukjunlim/SevenNet-dFS.git
 cd SevenNet_dFS
 
 # Install dependencies
