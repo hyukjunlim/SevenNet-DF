@@ -30,7 +30,7 @@ atoms = traj[0]
 
 # Describe the interatomic interactions with the Effective Medium Theory
 if mode == 'df':
-    from sevenn_df.sevennet_calculator import SevenNetCalculator
+    from sevenn_dfs.sevennet_calculator import SevenNetCalculator
     atoms.calc = SevenNetCalculator(os.path.join(working_dir, 'checkpoint_best_base_full5.pth'))
 elif mode == '7net-0':
     from sevenn.sevennet_calculator import SevenNetCalculator
@@ -50,7 +50,7 @@ else:
 
 atoms = traj[0]
 if mode == 'df':
-    from sevenn_df.sevennet_calculator import SevenNetCalculator
+    from sevenn_dfs.sevennet_calculator import SevenNetCalculator
     atoms.calc = SevenNetCalculator(os.path.join(working_dir, 'checkpoint_best_base_full5.pth'))
 elif mode == '7net-0':
     from sevenn.sevennet_calculator import SevenNetCalculator

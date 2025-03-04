@@ -11,13 +11,13 @@
 
 nvidia-smi
 # python equivariance_test.py
-# python tuto.py
+python tuto.py
 # python tuto_full.py
 # python tuto_full_7net_0.py
 # python tuto_7net_0.py
 # python inference_test.py
 # python MD.py
-python MAE_test.py
+# python MAE_test.py
 
 
 

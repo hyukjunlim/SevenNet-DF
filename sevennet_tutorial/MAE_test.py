@@ -1,13 +1,13 @@
 import sys
 sys.path.append('../../SevenNet')
-import sevenn_df
+import sevenn_dfs
 import os.path
 
 data_path = './data'
 working_dir = os.getcwd() # save current path
 assert os.path.exists(data_path) and os.path.exists(os.path.join(data_path, 'train'))
 
-from sevenn_df.train.graph_dataset import SevenNetGraphDataset
+from sevenn_dfs.train.graph_dataset import SevenNetGraphDataset
 
 dataset_prefix = os.path.join(data_path, 'train')
 xyz_files = ['1200K.extxyz', '600K.extxyz']
@@ -40,9 +40,9 @@ valid_loader = DataLoader(valid_dataset, batch_size=8)
 
 from copy import deepcopy
 
-from sevenn_df._const import DEFAULT_E3_EQUIVARIANT_MODEL_CONFIG
-from sevenn_df.model_build import build_E3_equivariant_model
-import sevenn_df.util as util
+from sevenn_dfs._const import DEFAULT_E3_EQUIVARIANT_MODEL_CONFIG
+from sevenn_dfs.model_build import build_E3_equivariant_model
+import sevenn_dfs.util as util
 
 # copy default model configuration.
 model_cfg = deepcopy(DEFAULT_E3_EQUIVARIANT_MODEL_CONFIG)
@@ -66,8 +66,8 @@ num_weights = sum(p.numel() for p in model.parameters() if p.requires_grad)
 print(model) # model info
 print(f'# model weights: {num_weights}')
 
-from sevenn_df._const import DEFAULT_TRAINING_CONFIG
-from sevenn_df.train.trainer import Trainer
+from sevenn_dfs._const import DEFAULT_TRAINING_CONFIG
+from sevenn_dfs.train.trainer import Trainer
 
 # copy default training configuration
 train_cfg = deepcopy(DEFAULT_TRAINING_CONFIG)
@@ -91,7 +91,7 @@ print(trainer.loss_functions)  # We have energy, force, stress loss function by 
 print(trainer.optimizer)
 print(trainer.scheduler)
 
-from sevenn_df.error_recorder import ErrorRecorder
+from sevenn_dfs.error_recorder import ErrorRecorder
 
 train_cfg.update({
   # List of tuple [Quantity name, metric name]
@@ -139,7 +139,7 @@ config.update(train_cfg)
 import torch
 import ase.io
 
-from sevenn_df.sevennet_calculator import SevenNetCalculator
+from sevenn_dfs.sevennet_calculator import SevenNetCalculator
 
 # Let's test our model by predicting DFT MD trajectory
 # Instead of using other functions in SevenNet, we will use ASE calculator as an interface of our model
